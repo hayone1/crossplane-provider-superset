@@ -1,0 +1,927 @@
+name: platacard/superset
+resources:
+    superset_annotation:
+        subCategory: ""
+        description: 'Manages an annotation of an annotation layer: an event, or a period, that charts show on their time axis when they display the layer.'
+        name: superset_annotation
+        title: superset_annotation Resource - superset
+        examples:
+            - name: v2
+              manifest: |-
+                {
+                  "end_dttm": "2026-01-15T09:00:00",
+                  "layer_id": "${superset_annotation_layer.releases.id}",
+                  "long_descr": "New checkout flow",
+                  "short_descr": "v2.0.0",
+                  "start_dttm": "2026-01-15T09:00:00"
+                }
+              references:
+                layer_id: superset_annotation_layer.releases.id
+              dependencies:
+                superset_annotation_layer.releases: |-
+                    {
+                      "description": "Production releases",
+                      "name": "Releases"
+                    }
+            - name: freeze
+              manifest: |-
+                {
+                  "end_dttm": "2027-01-05T00:00:00",
+                  "json_metadata": "${jsonencode({ color = \"#999999\" })}",
+                  "layer_id": "${superset_annotation_layer.releases.id}",
+                  "short_descr": "Holiday freeze",
+                  "start_dttm": "2026-12-20T00:00:00"
+                }
+              references:
+                layer_id: superset_annotation_layer.releases.id
+              dependencies:
+                superset_annotation_layer.releases: |-
+                    {
+                      "description": "Production releases",
+                      "name": "Releases"
+                    }
+        argumentDocs:
+            end_dttm: (String) End of the annotation, in the same format, not before the start. Equal to the start for an instant.
+            id: (Number) Numeric identifier of the annotation.
+            json_metadata: (String) JSON document with extra settings of the annotation.
+            layer_id: (Number) Identifier of the annotation layer. Changing it replaces the annotation.
+            long_descr: (String) Free-text description of the annotation.
+            short_descr: (String) Title of the annotation, unique within the layer.
+            start_dttm: (String) Start of the annotation, as YYYY-MM-DDTHH:MM:SS without a time zone, for example 2026-01-15T00:00:00.
+        importStatements: []
+    superset_annotation_layer:
+        subCategory: ""
+        description: 'Manages an annotation layer: a named group of annotations that charts can display as event markers.'
+        name: superset_annotation_layer
+        title: superset_annotation_layer Resource - superset
+        examples:
+            - name: releases
+              manifest: |-
+                {
+                  "description": "One annotation per release, shown on the KPI charts",
+                  "name": "Product releases"
+                }
+        argumentDocs:
+            description: (String) Free-text description of the layer.
+            id: (Number) Numeric identifier of the layer.
+            name: (String) Name of the layer.
+        importStatements:
+            - |-
+              # An annotation layer is imported by its numeric id.
+              terraform import superset_annotation_layer.releases 2
+    superset_assets_import:
+        subCategory: ""
+        description: 'Imports a whole export bundle at once through the assets endpoint: its databases, datasets, charts, dashboards and saved queries, overwriting the ones that exist, and imports it again whenever its files change. Destroying the resource deletes the imported dashboards, charts and datasets, in that order; the databases stay.'
+        name: superset_assets_import
+        title: superset_assets_import Resource - superset
+        examples:
+            - name: analytics
+              manifest: |-
+                {
+                  "database_passwords": {
+                    "databases/warehouse.yaml": "${var.warehouse_password}"
+                  },
+                  "source": "${path.module}/exports/analytics"
+                }
+        argumentDocs:
+            chart_ids: (Map of Number) Identifiers of the imported charts, keyed by the uuid of their export.
+            content_hash: (String) Hash of the files of the bundle. A change of the files plans an import.
+            dashboard_ids: (Map of Number) Identifiers of the imported dashboards, keyed by the uuid of their export.
+            database_passwords: (Map of String, Sensitive) Passwords of the databases of the bundle, needed when a database is created by the import. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            dataset_ids: (Map of Number) Identifiers of the imported datasets, keyed by the uuid of their export.
+            files: (Map of String) The files of the bundle, keyed by their path in the export layout, such as dashboards/sales.yaml or databases/warehouse.yaml, with their YAML content as values. The provider zips them with a metadata.yaml of the right type, as it does for a directory in source. Use it instead of source where the provider cannot read files, for example when it runs in a controller. Exactly one of source and files must be set.
+            source: (String) Directory in the export layout of Superset (dashboards/, charts/, datasets/, databases/, queries/), or an export zip file. A directory is bundled by the provider with a metadata.yaml of the assets type. Exactly one of source and files must be set.
+            sparse: (Boolean) Whether the dashboards of the bundle may reference charts that exist in Superset but are not in the bundle. Recent versions of Superset only. Defaults to false.
+            ssh_tunnel_passwords: (Map of String, Sensitive) Passwords of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_key_passwords: (Map of String, Sensitive) Passphrases of the private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_keys: (Map of String, Sensitive) Private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+        importStatements: []
+    superset_chart:
+        subCategory: ""
+        description: Manages a chart. Place a chart on a dashboard through the position_json of the dashboard.
+        name: superset_chart
+        title: superset_chart Resource - superset
+        examples:
+            - name: daily_signups
+              manifest: |-
+                {
+                  "cache_timeout": 300,
+                  "datasource_id": "${superset_dataset.signups.id}",
+                  "description": "Signups per day over the last month",
+                  "name": "Daily signups",
+                  "params": "${jsonencode({\n    viz_type   = \"echarts_timeseries_line\"\n    x_axis     = \"day\"\n    metrics    = [\"count\"]\n    time_range = \"Last month\"\n  })}",
+                  "viz_type": "echarts_timeseries_line"
+                }
+              references:
+                datasource_id: superset_dataset.signups.id
+        argumentDocs:
+            cache_timeout: (Number) Duration in seconds for which the chart data is cached. Unset to use the timeout of the dataset or database.
+            certification_details: (String) Details of the certification.
+            certified_by: (String) Person or group that certified the chart.
+            datasource_id: (Number) Identifier of the dataset the chart is built on.
+            datasource_type: '(String) Type of the datasource: table (a dataset, the default), query, saved_query or view.'
+            description: (String) Free-text description of the chart.
+            id: (Number) Numeric identifier of the chart.
+            name: (String) Name of the chart.
+            owners: (Set of Number) Identifiers of the users who own the chart. Defaults to the user the provider authenticates as.
+            params: (String) JSON document with the form data of the chart, as shown in the chart's View query and Edit chart properties dialogs. Formatting differences are not reported as drift.
+            query_context: (String) JSON document with the query context of the chart, which Superset uses for alerts, reports and cache warm-up. When unset, the query context Superset generates on its own is left alone.
+            tags: (Set of String) Names of the tags attached to the chart, with the TAGGING_SYSTEM feature flag. When unset, the tags are left as they are; when set, the chart has exactly these tags. Tags that do not exist yet are created, and stay when the chart is destroyed.
+            viz_type: (String) Visualization type, for example table or echarts_timeseries_line.
+        importStatements:
+            - |-
+              # Charts are imported by their numeric id.
+              terraform import superset_chart.daily_signups 42
+    superset_chart_import:
+        subCategory: ""
+        description: 'Imports the charts of an export bundle together with the datasets and databases they depend on, and imports them again whenever the bundle changes. Destroying the resource deletes the charts only. When one export feeds several import resources, order them with depends_on (datasets, then charts, then dashboards): Superset refuses to delete a dataset that charts still use.'
+        name: superset_chart_import
+        title: superset_chart_import Resource - superset
+        examples:
+            - name: kpis
+              manifest: |-
+                {
+                  "database_passwords": {
+                    "databases/warehouse.yaml": "${var.warehouse_password}"
+                  },
+                  "source": "${path.module}/exports/kpi_charts.zip"
+                }
+        argumentDocs:
+            chart_ids: (Map of Number) Identifiers of the imported charts, keyed by the uuid of their export.
+            content_hash: (String) Hash of the files of the bundle. A change of the files plans an import.
+            database_passwords: (Map of String, Sensitive) Passwords of the databases of the bundle, needed when a database is created by the import. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            files: (Map of String) The files of the bundle, keyed by their path in the export layout, such as dashboards/sales.yaml or databases/warehouse.yaml, with their YAML content as values. The provider zips them with a metadata.yaml of the right type, as it does for a directory in source. Use it instead of source where the provider cannot read files, for example when it runs in a controller. Exactly one of source and files must be set.
+            overwrite: (Boolean) Whether objects that already exist in Superset are replaced. Without it, Superset refuses to import an object that exists. Defaults to true.
+            source: (String) Directory in the export layout of Superset (dashboards/, charts/, datasets/, databases/), or an export zip file. A directory is bundled by the provider with a metadata.yaml of the right type, so one export can feed every import resource. Exactly one of source and files must be set.
+            ssh_tunnel_passwords: (Map of String, Sensitive) Passwords of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_key_passwords: (Map of String, Sensitive) Passphrases of the private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_keys: (Map of String, Sensitive) Private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+        importStatements: []
+    superset_css_template:
+        subCategory: ""
+        description: 'Manages a CSS template: a reusable stylesheet that can be applied to dashboards.'
+        name: superset_css_template
+        title: superset_css_template Resource - superset
+        examples:
+            - name: dark_header
+              manifest: |-
+                {
+                  "css": ".dashboard-header {\n  background-color: #1f1f1f;\n  color: #ffffff;\n}\n",
+                  "template_name": "Dark header"
+                }
+        argumentDocs:
+            css: (String) The stylesheet.
+            id: (Number) Numeric identifier of the template.
+            template_name: (String) Name of the template as shown in Superset.
+        importStatements:
+            - |-
+              # A CSS template is imported by its numeric id.
+              terraform import superset_css_template.dark_header 7
+    superset_dashboard:
+        subCategory: ""
+        description: Manages a dashboard. The charts shown on the dashboard are the charts placed in its position_json.
+        name: superset_dashboard
+        title: superset_dashboard Resource - superset
+        examples:
+            - name: signups
+              manifest: |-
+                {
+                  "json_metadata": "${jsonencode({\n    refresh_frequency = 300\n    color_scheme      = \"supersetColors\"\n  })}",
+                  "position_json": "${jsonencode({\n    DASHBOARD_VERSION_KEY = \"v2\"\n    ROOT_ID               = { type = \"ROOT\", id = \"ROOT_ID\", children = [\"GRID_ID\"] }\n    GRID_ID               = { type = \"GRID\", id = \"GRID_ID\", parents = [\"ROOT_ID\"], children = [\"ROW-1\"] }\n    \"ROW-1\" = {\n      type     = \"ROW\"\n      id       = \"ROW-1\"\n      parents  = [\"ROOT_ID\", \"GRID_ID\"]\n      children = [\"CHART-1\"]\n      meta     = { background = \"BACKGROUND_TRANSPARENT\" }\n    }\n    \"CHART-1\" = {\n      type     = \"CHART\"\n      id       = \"CHART-1\"\n      parents  = [\"ROOT_ID\", \"GRID_ID\", \"ROW-1\"]\n      children = []\n      meta     = { chartId = superset_chart.daily_signups.id, width = 6, height = 50 }\n    }\n  })}",
+                  "published": true,
+                  "roles": [
+                    "${superset_role.analysts.id}"
+                  ],
+                  "slug": "signups",
+                  "title": "Signups"
+                }
+              references:
+                roles: superset_role.analysts.id
+        argumentDocs:
+            certification_details: (String) Details of the certification.
+            certified_by: (String) Person or group that certified the dashboard.
+            css: (String) CSS applied to the dashboard.
+            id: (Number) Numeric identifier of the dashboard.
+            json_metadata: '(String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.'
+            owners: (Set of Number) Identifiers of the users who own the dashboard. Defaults to the user the provider authenticates as.
+            position_json: (String) JSON document with the layout of the dashboard. The charts referenced by its CHART elements are linked to the dashboard. Superset adds the uuid of each chart to the layout, which is not reported as drift. When unset, the layout is left to Superset.
+            published: (Boolean) Whether the dashboard is published; an unpublished dashboard is a draft visible to its owners only. Defaults to false.
+            roles: (Set of Number) Identifiers of the roles granted access to the dashboard when dashboard role-based access control is enabled.
+            slug: (String) Unique slug used in the URL of the dashboard instead of its id.
+            tags: (Set of String) Names of the tags attached to the dashboard, with the TAGGING_SYSTEM feature flag. When unset, the tags are left as they are; when set, the dashboard has exactly these tags. Tags that do not exist yet are created, and stay when the dashboard is destroyed.
+            theme_id: (Number) Identifier of the superset_theme the dashboard applies, on Superset 6. Unset, the dashboard uses the theme of the instance.
+            title: (String) Title of the dashboard.
+        importStatements:
+            - |-
+              # Dashboards are imported by their numeric id.
+              terraform import superset_dashboard.signups 17
+    superset_dashboard_embedding:
+        subCategory: ""
+        description: Makes a dashboard embeddable in other applications with the Superset embedded SDK. Guest tokens for the embedded dashboard require the EMBEDDED_SUPERSET feature flag in Superset.
+        name: superset_dashboard_embedding
+        title: superset_dashboard_embedding Resource - superset
+        examples:
+            - name: signups
+              manifest: |-
+                {
+                  "allowed_domains": [
+                    "https://app.example.com",
+                    "https://portal.example.com"
+                  ],
+                  "dashboard_id": "${superset_dashboard.signups.id}"
+                }
+              references:
+                dashboard_id: superset_dashboard.signups.id
+        argumentDocs:
+            allowed_domains: (Set of String) Origins allowed to embed the dashboard, for example https://app.example.com. An empty set allows every origin.
+            dashboard_id: (Number) Identifier of the dashboard to embed. Changing it replaces the configuration, which gives the embedded dashboard a new uuid.
+            id: (Number) Identifier of the embedding configuration, which is the identifier of the dashboard.
+            uuid: (String) Identifier under which the embedded SDK loads the dashboard.
+        importStatements:
+            - |-
+              # The embedding configuration is imported by the numeric id of its dashboard.
+              terraform import superset_dashboard_embedding.signups 17
+    superset_dashboard_import:
+        subCategory: ""
+        description: 'Imports the dashboards of an export bundle together with the charts, datasets and databases they depend on, and imports them again whenever the bundle changes. Destroying the resource deletes the dashboards only. When one export feeds several import resources, order them with depends_on (datasets, then charts, then dashboards): Superset refuses to delete a dataset that charts still use.'
+        name: superset_dashboard_import
+        title: superset_dashboard_import Resource - superset
+        examples:
+            - name: signups
+              manifest: |-
+                {
+                  "database_passwords": {
+                    "databases/warehouse.yaml": "${var.warehouse_password}"
+                  },
+                  "source": "${path.module}/exports/signups"
+                }
+            - name: signups_inline
+              manifest: |-
+                {
+                  "database_passwords": {
+                    "warehouse.yaml": "${var.warehouse_password}"
+                  },
+                  "files": "${{\n    for file in fileset(\"${path.module}/exports/signups\", \"**/*.yaml\") :\n    file =\u003e file(\"${path.module}/exports/signups/${file}\")\n  }}"
+                }
+        argumentDocs:
+            content_hash: (String) Hash of the files of the bundle. A change of the files plans an import.
+            dashboard_ids: (Map of Number) Identifiers of the imported dashboards, keyed by the uuid of their export.
+            database_passwords: (Map of String, Sensitive) Passwords of the databases of the bundle, needed when a database is created by the import. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            files: (Map of String) The files of the bundle, keyed by their path in the export layout, such as dashboards/sales.yaml or databases/warehouse.yaml, with their YAML content as values. The provider zips them with a metadata.yaml of the right type, as it does for a directory in source. Use it instead of source where the provider cannot read files, for example when it runs in a controller. Exactly one of source and files must be set.
+            overwrite: (Boolean) Whether objects that already exist in Superset are replaced. Without it, Superset refuses to import an object that exists. Defaults to true.
+            source: (String) Directory in the export layout of Superset (dashboards/, charts/, datasets/, databases/), or an export zip file. A directory is bundled by the provider with a metadata.yaml of the right type, so one export can feed every import resource. Exactly one of source and files must be set.
+            ssh_tunnel_passwords: (Map of String, Sensitive) Passwords of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_key_passwords: (Map of String, Sensitive) Passphrases of the private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_keys: (Map of String, Sensitive) Private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+        importStatements: []
+    superset_database:
+        subCategory: ""
+        description: Manages a database connection. The connection is given either as a full sqlalchemy_uri or as its parts (db_engine, db_user, db_pass, db_host, db_port and db_name). Superset tests the connection when it is created or updated.
+        name: superset_database
+        title: superset_database Resource - superset
+        examples:
+            - name: warehouse
+              manifest: |-
+                {
+                  "allow_ctas": false,
+                  "allow_cvas": false,
+                  "allow_dml": false,
+                  "allow_run_async": true,
+                  "connection_name": "Warehouse",
+                  "db_engine": "postgresql",
+                  "db_host": "pg.db.ro.domain.com",
+                  "db_name": "warehouse",
+                  "db_pass": "${var.warehouse_password}",
+                  "db_port": 5432,
+                  "db_user": "superset",
+                  "expose_in_sqllab": true
+                }
+              references:
+                db_pass: var.warehouse_password
+            - name: analytics
+              manifest: |-
+                {
+                  "allow_ctas": true,
+                  "allow_cvas": false,
+                  "allow_dml": false,
+                  "allow_file_upload": true,
+                  "allow_run_async": true,
+                  "cache_timeout": 600,
+                  "connection_name": "Analytics",
+                  "expose_in_sqllab": true,
+                  "extra": "${jsonencode({\n    client_encoding                 = \"utf8\"\n    schemas_allowed_for_file_upload = [\"uploads\"]\n  })}",
+                  "force_ctas_schema": "scratch",
+                  "sqlalchemy_uri": "postgresql://superset:${var.analytics_password}@pg.internal:5432/analytics",
+                  "ssh_tunnel": {
+                    "private_key": "${file(\"${path.module}/bastion_rsa.pem\")}",
+                    "server_address": "bastion.internal",
+                    "server_port": 22,
+                    "username": "superset"
+                  }
+                }
+        argumentDocs:
+            allow_ctas: (Boolean) Whether CREATE TABLE AS is allowed in SQL Lab.
+            allow_cvas: (Boolean) Whether CREATE VIEW AS is allowed in SQL Lab.
+            allow_dml: (Boolean) Whether DML statements are allowed in SQL Lab.
+            allow_file_upload: (Boolean) Whether files can be uploaded into the database. The allowed schemas are set in extra as schemas_allowed_for_file_upload. Defaults to false.
+            allow_run_async: (Boolean) Whether SQL Lab queries run asynchronously through Celery.
+            cache_timeout: '(Number) Duration in seconds for which the charts of the database are cached. When unset, the value is left as it is in Superset: the timeout of the Superset instance for a new connection.'
+            connection_name: (String) Name of the database connection.
+            db_engine: (String) SQLAlchemy dialect of the connection, for example postgresql or mysql+pymysql. Required with the other parts when sqlalchemy_uri is not set.
+            db_host: (String) Host of the database server.
+            db_name: (String) Name of the database.
+            db_pass: (String, Sensitive) Password of the connection. It is inserted into the URI as is, so percent-encode special characters or use sqlalchemy_uri.
+            db_port: (Number) Port of the database server.
+            db_user: (String) Username of the connection.
+            expose_in_sqllab: (Boolean) Whether the connection is available in SQL Lab.
+            extra: '(String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.'
+            force_ctas_schema: (String) Schema in which CREATE TABLE AS creates its tables when the query does not name one.
+            id: (Number) Numeric identifier of the database connection.
+            impersonate_user: (Boolean) Whether queries run as the logged-in user instead of the user of the connection. Defaults to false.
+            masked_encrypted_extra: (String, Sensitive) JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.
+            password: (String, Sensitive) Password of the user. Conflicts with private_key.
+            private_key: (String, Sensitive) RSA private key of the user, in PEM format. Conflicts with password.
+            private_key_password: (String, Sensitive) Passphrase of the private key.
+            server_address: (String) Host of the SSH server.
+            server_cert: (String) CA bundle, in PEM format, used to validate the certificate of the database server.
+            server_port: (Number) Port of the SSH server.
+            sqlalchemy_uri: (String, Sensitive) Full SQLAlchemy URI of the connection, for engines whose URI does not fit the parts, for example awsathena+rest://... or trino://.... Conflicts with the parts. Changes made to the URI in the Superset UI are not detected, because Superset masks the password in the URI it returns.
+            ssh_tunnel: (Attributes) SSH tunnel through which Superset reaches the database. Requires the SSH_TUNNELING feature flag in Superset. Superset authenticates with either password or private_key; the private key must be an RSA key. (see below for nested schema)
+            username: (String) User on the SSH server.
+        importStatements:
+            - |-
+              # Database can be imported by specifying the numeric identifier of the Database id
+              terraform import superset_database.example 337
+    superset_database_permissions_sync:
+        subCategory: ""
+        description: Makes Superset 6 refresh the permissions of the catalogs and schemas of a database connection, as the Sync permissions action of the connection does, so roles can be granted catalog_access and schema_access on what the source gained. The sync runs when the resource is created and again whenever database_id or triggers change; it is not undone when the resource is destroyed.
+        name: superset_database_permissions_sync
+        title: superset_database_permissions_sync Resource - superset
+        examples:
+            - name: warehouse
+              manifest: |-
+                {
+                  "database_id": "${superset_database.warehouse.id}",
+                  "triggers": {
+                    "version": "2"
+                  }
+                }
+              references:
+                database_id: superset_database.warehouse.id
+        argumentDocs:
+            database_id: (Number) Numeric identifier of the database connection to sync.
+            id: (Number) Numeric identifier of the database connection.
+            triggers: (Map of String) Arbitrary values whose change runs the sync again, for example the list of schemas of the source.
+        importStatements: []
+    superset_dataset:
+        subCategory: ""
+        description: 'Manages a dataset: a table of a database, or a virtual dataset defined by a SQL query. Superset detects the columns of the dataset and creates its count metric itself; columns and metrics take them over when set.'
+        name: superset_dataset
+        title: superset_dataset Resource - superset
+        examples:
+            - name: sales
+              manifest: |-
+                {
+                  "cache_timeout": 600,
+                  "columns": [
+                    {
+                      "column_name": "id",
+                      "groupby": false
+                    },
+                    {
+                      "column_name": "amount",
+                      "verbose_name": "Amount"
+                    },
+                    {
+                      "column_name": "sold_at",
+                      "is_dttm": true
+                    },
+                    {
+                      "column_name": "amount_cents",
+                      "expression": "amount * 100",
+                      "type": "NUMERIC"
+                    }
+                  ],
+                  "database_name": "${superset_database.warehouse.connection_name}",
+                  "description": "One row per sale",
+                  "extra": "${jsonencode({\n    certification = { certified_by = \"Data team\", details = \"Reviewed monthly\" }\n  })}",
+                  "main_dttm_col": "sold_at",
+                  "metrics": [
+                    {
+                      "expression": "COUNT(*)",
+                      "metric_name": "count",
+                      "verbose_name": "Sales"
+                    },
+                    {
+                      "d3format": ",.2f",
+                      "expression": "SUM(amount)",
+                      "metric_name": "revenue",
+                      "verbose_name": "Revenue"
+                    }
+                  ],
+                  "schema": "public",
+                  "table_name": "sales"
+                }
+              references:
+                database_name: superset_database.warehouse.connection_name
+            - name: signups_per_day
+              manifest: |-
+                {
+                  "database_name": "${superset_database.warehouse.connection_name}",
+                  "sql": "SELECT day, count(*) AS signups FROM signups WHERE region = '{{ region }}' GROUP BY day",
+                  "table_name": "signups_per_day",
+                  "template_params": "${jsonencode({ region = \"eu\" })}"
+                }
+              references:
+                database_name: superset_database.warehouse.connection_name
+        argumentDocs:
+            always_filter_main_dttm: (Boolean) Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to false.
+            cache_timeout: (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+            column_name: (String) Name of the column, unique within the dataset.
+            columns: (Attributes Set) Columns of the dataset. When unset, the columns are left to Superset, which detects them from the source. When set, the dataset has exactly these columns, and columns not listed here are deleted. Within a column, only the attributes that are set are written, so the others keep the value Superset has, such as the detected type; an empty string clears an attribute. (see below for nested schema)
+            d3format: (String) D3 format of the values, for example ,.2f.
+            database_name: (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+            default_endpoint: (String) URL Superset redirects to when the dataset is opened.
+            description: (String) Free-text description of the dataset.
+            expression: (String) SQL expression of a calculated column, for example amount * 100.
+            extra: (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+            fetch_values_predicate: (String) SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+            filter_select_enabled: (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
+            filterable: (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
+            groupby: (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
+            id: (Number) Numeric identifier of the dataset.
+            is_dttm: (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+            main_dttm_col: (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+            metric_name: (String) Name of the metric, unique within the dataset.
+            metric_type: (String) Type of the aggregate, for example sum or count; informational.
+            metrics: '(Attributes Set) Metrics of the dataset. When unset, the metrics are left to Superset, which creates count with every dataset. When set, the dataset has exactly these metrics: declare count too if it should stay, and metrics not listed here are deleted. (see below for nested schema)'
+            normalize_columns: (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
+            owners: (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+            perm: (String) View menu of the datasource_access permission of the dataset, [<database>].[<table>](id:<id>), for superset_role_permissions.
+            python_date_format: (String) Format of the values of a datetime column stored as text, for example %Y-%m-%d, or epoch_s.
+            schema: (String) Schema of the table.
+            schema_perm: (String) View menu of the schema_access permission of the schema of the dataset, [<database>].[<schema>]; null without a schema.
+            sql: '(String) SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the ENABLE_TEMPLATE_PROCESSING feature flag, and on Superset 3.1, whose create endpoint does not take template_params, their parameters need a default such as {{ region | default(''eu'') }}.'
+            table_name: (String) Name of the table, or name of the virtual dataset.
+            template_params: (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+            type: (String) Data type of the column, for example NUMERIC. Superset detects it for the columns of the source; set it for a calculated column.
+            verbose_name: (String) Label shown instead of the name.
+            warning_text: (String) Warning shown next to the metric.
+        importStatements:
+            - |-
+              # Dataset can be imported by specifying the numeric identifier of the Dataset id
+              terraform import superset_dataset.example 123
+    superset_dataset_import:
+        subCategory: ""
+        description: 'Imports the datasets of an export bundle together with the databases they depend on, and imports them again whenever the bundle changes. Destroying the resource deletes the datasets only. When one export feeds several import resources, order them with depends_on (datasets, then charts, then dashboards): Superset refuses to delete a dataset that charts still use.'
+        name: superset_dataset_import
+        title: superset_dataset_import Resource - superset
+        examples:
+            - name: warehouse
+              manifest: |-
+                {
+                  "database_passwords": {
+                    "databases/warehouse.yaml": "${var.warehouse_password}"
+                  },
+                  "source": "${path.module}/exports/warehouse",
+                  "sync_columns": true,
+                  "sync_metrics": true
+                }
+              dependencies:
+                superset_chart_import.warehouse: |-
+                    {
+                      "depends_on": [
+                        "${superset_dataset_import.warehouse}"
+                      ],
+                      "source": "${path.module}/exports/warehouse"
+                    }
+        argumentDocs:
+            content_hash: (String) Hash of the files of the bundle. A change of the files plans an import.
+            database_passwords: (Map of String, Sensitive) Passwords of the databases of the bundle, needed when a database is created by the import. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            dataset_ids: (Map of Number) Identifiers of the imported datasets, keyed by the uuid of their export.
+            files: (Map of String) The files of the bundle, keyed by their path in the export layout, such as dashboards/sales.yaml or databases/warehouse.yaml, with their YAML content as values. The provider zips them with a metadata.yaml of the right type, as it does for a directory in source. Use it instead of source where the provider cannot read files, for example when it runs in a controller. Exactly one of source and files must be set.
+            overwrite: (Boolean) Whether objects that already exist in Superset are replaced. Without it, Superset refuses to import an object that exists. Defaults to true.
+            source: (String) Directory in the export layout of Superset (dashboards/, charts/, datasets/, databases/), or an export zip file. A directory is bundled by the provider with a metadata.yaml of the right type, so one export can feed every import resource. Exactly one of source and files must be set.
+            ssh_tunnel_passwords: (Map of String, Sensitive) Passwords of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_key_passwords: (Map of String, Sensitive) Passphrases of the private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            ssh_tunnel_private_keys: (Map of String, Sensitive) Private keys of the SSH tunnels of the databases of the bundle. Keyed by the path of the database file inside the bundle, such as databases/warehouse.yaml, or by the file name alone, such as warehouse.yaml.
+            sync_columns: (Boolean) Whether the columns of datasets that already exist are replaced by the columns of the bundle. Defaults to false.
+            sync_metrics: (Boolean) Whether the metrics of datasets that already exist are replaced by the metrics of the bundle. Defaults to false.
+        importStatements: []
+    superset_dataset_refresh:
+        subCategory: ""
+        description: 'Syncs the columns of a dataset from its source, as the Sync columns from source button of the dataset editor does: Superset adds the columns the source gained, removes the ones it lost, updates the type of the ones it has, and recreates the count metric when it is missing. Calculated columns and the labels of the columns are kept, while groupby and filterable are reset to true. The sync runs when the resource is created and again whenever dataset_id or triggers change; it is not undone when the resource is destroyed.'
+        name: superset_dataset_refresh
+        title: superset_dataset_refresh Resource - superset
+        examples:
+            - name: sales
+              manifest: |-
+                {
+                  "dataset_id": "${superset_dataset.sales.id}",
+                  "triggers": {
+                    "version": "2"
+                  }
+                }
+              references:
+                dataset_id: superset_dataset.sales.id
+        argumentDocs:
+            dataset_id: (Number) Numeric identifier of the dataset to sync.
+            id: (Number) Numeric identifier of the dataset.
+            triggers: (Map of String) Arbitrary values whose change runs the sync again, for example the version of the source table.
+        importStatements: []
+    superset_group:
+        subCategory: ""
+        description: 'Manages a group of users, on Superset 6: its members get the roles of the group. The group endpoints belong to the Flask-AppBuilder security API, which Superset only enables with FAB_ADD_SECURITY_API = True.'
+        name: superset_group
+        title: superset_group Resource - superset
+        examples:
+            - name: finance
+              manifest: |-
+                {
+                  "description": "The finance team",
+                  "label": "Finance",
+                  "name": "finance",
+                  "roles": [
+                    "${superset_role.analysts.id}"
+                  ],
+                  "users": [
+                    "${superset_user.alice.id}"
+                  ]
+                }
+              references:
+                roles: superset_role.analysts.id
+                users: superset_user.alice.id
+              dependencies:
+                superset_role.analysts: |-
+                    {
+                      "name": "Analysts"
+                    }
+        argumentDocs:
+            description: (String) Free-text description of the group.
+            id: (Number) Numeric identifier of the group.
+            label: (String) Label shown instead of the name.
+            name: (String) Name of the group, unique in Superset.
+            roles: (Set of Number) Identifiers of the roles the members of the group get, for example from superset_role.
+            users: (Set of Number) Identifiers of the members of the group, for example from superset_user.
+        importStatements: []
+    superset_meta_database:
+        subCategory: ""
+        description: Manages a meta database connection in Superset for cross-database queries.
+        name: superset_meta_database
+        title: superset_meta_database Resource - superset
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "allow_ctas": false,
+                  "allow_cvas": false,
+                  "allow_dml": false,
+                  "allow_run_async": true,
+                  "allowed_databases": [
+                    "[Team]-Service1-Dev-RO[d_team_service1_db]",
+                    "[Team]-Service2-Prod-RO[d_team_market_service2_db]"
+                  ],
+                  "database_name": "SuperSetDBConnection",
+                  "expose_in_sqllab": true,
+                  "is_managed_externally": false,
+                  "sqlalchemy_uri": "superset://"
+                }
+        argumentDocs:
+            allow_ctas: (Boolean) Allow CREATE TABLE AS queries.
+            allow_cvas: (Boolean) Allow CREATE VIEW AS queries.
+            allow_dml: (Boolean) Allow DML queries (INSERT, UPDATE, DELETE).
+            allow_run_async: (Boolean) Allow asynchronous query execution.
+            allowed_databases: (List of String) List of database names that can be accessed through this meta connection.
+            database_name: (String) Name of the meta database connection.
+            expose_in_sqllab: (Boolean) Whether to expose this connection in SQL Lab.
+            id: (Number) Numeric identifier of the meta database connection.
+            is_managed_externally: (Boolean) Whether this connection is managed externally.
+            sqlalchemy_uri: (String) SQLAlchemy URI for the meta database connection. Defaults to 'superset://' for meta databases.
+        importStatements:
+            - |-
+              # Database can be imported by specifying the numeric identifier of the Database id
+              terraform import superset_meta_database.example 1949
+    superset_report:
+        subCategory: ""
+        description: 'Manages a report or an alert of the Alerts & Reports page: a chart or a dashboard sent to recipients on a schedule, or, for an alert, when a SQL query meets a condition. The ALERT_REPORTS feature flag must be on, and Superset needs its workers to actually send anything.'
+        name: superset_report
+        title: superset_report Resource - superset
+        examples:
+            - name: weekly_sales
+              manifest: |-
+                {
+                  "crontab": "0 9 * * 1",
+                  "dashboard_id": "${superset_dashboard.sales.id}",
+                  "description": "Sales of the past week",
+                  "name": "Weekly sales",
+                  "recipients": [
+                    {
+                      "target": "sales@example.com, management@example.com",
+                      "type": "Email"
+                    },
+                    {
+                      "target": "#sales",
+                      "type": "Slack"
+                    }
+                  ],
+                  "timezone": "Europe/Berlin",
+                  "type": "Report"
+                }
+              references:
+                dashboard_id: superset_dashboard.sales.id
+            - name: low_sales
+              manifest: |-
+                {
+                  "chart_id": "${superset_chart.sales_today.id}",
+                  "crontab": "0 * * * *",
+                  "database_name": "${superset_database.warehouse.connection_name}",
+                  "grace_period": 3600,
+                  "name": "Low sales",
+                  "recipients": [
+                    {
+                      "target": "ops@example.com",
+                      "type": "Email"
+                    }
+                  ],
+                  "report_format": "TEXT",
+                  "sql": "SELECT sum(amount) FROM sales WHERE sold_at \u003e= current_date",
+                  "type": "Alert",
+                  "validator_op": "\u003c",
+                  "validator_threshold": 1000,
+                  "validator_type": "operator"
+                }
+              references:
+                chart_id: superset_chart.sales_today.id
+                database_name: superset_database.warehouse.connection_name
+        argumentDocs:
+            active: (Boolean) Whether the schedule runs. Defaults to true.
+            bcc: (String) Addresses in blind copy of an email, on recent versions of Superset.
+            cc: (String) Addresses in copy of an email, on recent versions of Superset.
+            chart_id: (Number) Identifier of the chart to send. Set either chart_id or dashboard_id.
+            context_markdown: (String) Markdown text sent with the content.
+            crontab: (String) Schedule as a cron expression, for example 0 9 * * 1 for every Monday at 09:00.
+            custom_width: (Number) Width in pixels of the screenshot of the content.
+            dashboard_id: (Number) Identifier of the dashboard to send. Set either chart_id or dashboard_id.
+            database_name: (String) Name of the database connection an alert runs its query on. Alerts only.
+            description: (String) Free-text description of the report.
+            email_subject: (String) Subject of the email, on recent versions of Superset.
+            extra: '(String) JSON document with extra settings, such as the tabs of a dashboard to send: {"dashboard": {"activeTabs": ["TAB-id"]}}.'
+            force_screenshot: (Boolean) Whether the screenshot is always taken fresh instead of served from the cache. Defaults to false.
+            grace_period: (Number) Seconds during which an alert that was already sent is not sent again. Defaults to the value Superset picks, usually 14400.
+            id: (Number) Numeric identifier of the report.
+            log_retention: (Number) Days the execution logs are kept. Defaults to the value Superset picks, usually 90.
+            name: (String) Name of the report, unique among the reports or among the alerts.
+            owners: (Set of Number) Identifiers of the users who own the report. Defaults to the user the provider authenticates as.
+            recipients: (Attributes Set) Destinations of the report, at least one. Superset 3.1 ignores an empty list, so the recipients can only be replaced, not all removed. (see below for nested schema)
+            report_format: '(String) Format of the content: PNG, CSV, TEXT, or PDF on recent versions of Superset. Defaults to PNG.'
+            sql: (String) SQL query of an alert, which must return a single value. Alerts only.
+            target: (String) Addresses separated by commas, a Slack channel, or a webhook URL.
+            timezone: (String) Time zone of the schedule, for example Europe/Berlin. Defaults to the one Superset picks, usually UTC.
+            type: (String) Report sends the content on every run; Alert runs the SQL query and sends the content when the condition is met.
+            validator_op: '(String) Comparison of the operator condition: <, <=, >, >=, == or !=.'
+            validator_threshold: (Number) Value the result of the query is compared with by the operator condition.
+            validator_type: '(String) Condition of an alert: not null triggers when the query returns a value, operator compares it with validator_threshold. Alerts only.'
+            working_timeout: (Number) Seconds a run may take before it is marked as failed. Defaults to the value Superset picks, usually 3600.
+        importStatements: []
+    superset_role:
+        subCategory: ""
+        description: Manages a role in Superset. Requires the Flask-AppBuilder security API, which Superset enables with FAB_ADD_SECURITY_API = True in superset_config.py.
+        name: superset_role
+        title: superset_role Resource - superset
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "name": "Example-Role-Name"
+                }
+        argumentDocs:
+            id: (Number) Numeric identifier of the role.
+            last_updated: (String) Timestamp of the last update.
+            name: (String) Name of the role.
+        importStatements:
+            - |-
+              # Role can be imported by specifying the numeric identifier of the role id
+              terraform import superset_role.example 632
+    superset_role_permissions:
+        subCategory: ""
+        description: Manages the permissions associated with a role in Superset. Requires the Flask-AppBuilder security API, which Superset enables with FAB_ADD_SECURITY_API = True in superset_config.py.
+        name: superset_role_permissions
+        title: superset_role_permissions Resource - superset
+        examples:
+            - name: example
+              manifest: |-
+                {
+                  "resource_permissions": [
+                    {
+                      "permission": "database_access",
+                      "view_menu": "[Trino].(id:34)"
+                    },
+                    {
+                      "permission": "schema_access",
+                      "view_menu": "[Trino].[devstorage]"
+                    }
+                  ],
+                  "role_name": "Example-DB-Connect"
+                }
+            - name: analysts
+              manifest: |-
+                {
+                  "resource_permissions": [
+                    {
+                      "permission": "datasource_access",
+                      "view_menu": "${superset_dataset.sales.perm}"
+                    },
+                    {
+                      "permission": "schema_access",
+                      "view_menu": "${superset_dataset.sales.schema_perm}"
+                    },
+                    {
+                      "permission": "database_access",
+                      "view_menu": "[Warehouse].(id:${superset_database.warehouse.id})"
+                    }
+                  ],
+                  "role_name": "${superset_role.analysts.name}"
+                }
+              references:
+                role_name: superset_role.analysts.name
+        argumentDocs:
+            id: (String) The unique identifier for the role permissions resource.
+            last_updated: (String) The timestamp of the last update to the role permissions.
+            permission: (String) The name of the permission.
+            resource_permissions: (Attributes List) A list of permissions associated with the role. (see below for nested schema)
+            role_name: (String) The name of the role to which the permissions are assigned.
+            view_menu: (String) The name of the view menu associated with the permission.
+        importStatements:
+            - |-
+              # Role permissions can be imported by specifying the numeric identifier of the role id
+              terraform import superset_role_permissions.example 129
+    superset_row_level_security:
+        subCategory: ""
+        description: 'Manages a row level security rule: a SQL clause that Superset adds to the queries of the given datasets for the members of the given roles.'
+        name: superset_row_level_security
+        title: superset_row_level_security Resource - superset
+        examples:
+            - name: emea_only
+              manifest: |-
+                {
+                  "clause": "region = 'EMEA'",
+                  "description": "Analysts see their own region",
+                  "filter_type": "Regular",
+                  "group_key": "region",
+                  "name": "EMEA only",
+                  "roles": [
+                    "${data.superset_role.analysts.id}"
+                  ],
+                  "tables": [
+                    "${superset_dataset.sales.id}"
+                  ]
+                }
+              references:
+                roles: data.superset_role.analysts.id
+                tables: superset_dataset.sales.id
+        argumentDocs:
+            clause: (String) SQL expression added to the WHERE clause, for example region = 'EMEA'.
+            description: (String) Free-text description of the rule.
+            filter_type: (String) Regular applies the clause to the queries of the listed roles; Base applies it to everyone except the listed roles. Defaults to Regular.
+            group_key: (String) Rules that share a group key are combined with OR, rules with different keys with AND.
+            id: (Number) Numeric identifier of the rule.
+            name: (String) Name of the rule.
+            roles: (Set of Number) Identifiers of the roles the rule applies to (or is excluded from, for a Base rule). Defaults to none.
+            tables: (Set of Number) Identifiers of the datasets the rule applies to.
+        importStatements:
+            - |-
+              # A row level security rule is imported by its numeric id.
+              terraform import superset_row_level_security.emea_only 5
+    superset_saved_query:
+        subCategory: ""
+        description: Manages a query saved in SQL Lab.
+        name: superset_saved_query
+        title: superset_saved_query Resource - superset
+        examples:
+            - name: daily_signups
+              manifest: |-
+                {
+                  "database_id": "${superset_database.analytics.id}",
+                  "description": "Signups per day, parameterised by date",
+                  "label": "Daily signups",
+                  "schema": "public",
+                  "sql": "SELECT count(*) FROM signups WHERE day = '{{ day }}'",
+                  "template_parameters": "${jsonencode({ day = \"2026-01-01\" })}"
+                }
+              references:
+                database_id: superset_database.analytics.id
+        argumentDocs:
+            catalog: (String) Default catalog the query runs in. Only Superset 4.1 and later support catalogs.
+            database_id: (Number) Identifier of the database connection the query runs against.
+            description: (String) Free-text description of the query.
+            id: (Number) Numeric identifier of the saved query.
+            label: (String) Name of the saved query as shown in SQL Lab.
+            schema: (String) Default schema the query runs in.
+            sql: (String) The SQL text.
+            template_parameters: (String) JSON object with the Jinja template parameters of the query.
+        importStatements:
+            - |-
+              # A saved query is imported by its numeric id.
+              terraform import superset_saved_query.daily_signups 9
+    superset_tag:
+        subCategory: ""
+        description: Manages a tag, a label attached to charts, dashboards and saved queries with the TAGGING_SYSTEM feature flag. The objects a tag is attached to are managed by the tags of superset_chart and superset_dashboard; the tag keeps them when it is renamed, and is detached from them when it is destroyed.
+        name: superset_tag
+        title: superset_tag Resource - superset
+        examples:
+            - name: finance
+              manifest: |-
+                {
+                  "description": "Owned by the finance team",
+                  "name": "finance"
+                }
+              dependencies:
+                superset_chart.revenue: |-
+                    {
+                      "datasource_id": "${superset_dataset.sales.id}",
+                      "name": "Revenue",
+                      "params": "${jsonencode({ viz_type = \"table\", all_columns = [\"day\", \"amount\"] })}",
+                      "tags": [
+                        "${superset_tag.finance.name}",
+                        "weekly-review"
+                      ],
+                      "viz_type": "table"
+                    }
+        argumentDocs:
+            description: (String) Free-text description of the tag.
+            id: (Number) Numeric identifier of the tag.
+            name: (String) Name of the tag, unique in Superset.
+        importStatements: []
+    superset_theme:
+        subCategory: ""
+        description: 'Manages a theme of the Superset UI, on Superset 6: a JSON document of design tokens that a superset_dashboard applies with theme_id, and that can be the default or the dark theme of the whole instance.'
+        name: superset_theme
+        title: superset_theme Resource - superset
+        examples:
+            - name: corporate
+              manifest: |-
+                {
+                  "json_data": "${jsonencode({\n    token = {\n      colorPrimary = \"#1f77b4\"\n      fontFamily   = \"Inter, sans-serif\"\n    }\n  })}",
+                  "name": "Corporate",
+                  "system_default": true
+                }
+              dependencies:
+                superset_dashboard.board: |-
+                    {
+                      "theme_id": "${superset_theme.executive.id}",
+                      "title": "Board"
+                    }
+            - name: executive
+              manifest: |-
+                {
+                  "json_data": "${jsonencode({ token = { colorPrimary = \"#2a9d8f\" } })}",
+                  "name": "Executive"
+                }
+              dependencies:
+                superset_dashboard.board: |-
+                    {
+                      "theme_id": "${superset_theme.executive.id}",
+                      "title": "Board"
+                    }
+        argumentDocs:
+            id: (Number) Numeric identifier of the theme.
+            json_data: '(String) JSON document with the design tokens of the theme, as the theme editor exports it, for example {"token": {"colorPrimary": "#1f77b4"}}.'
+            name: (String) Name of the theme.
+            system_dark: (Boolean) Whether the theme is the dark theme of the instance. Only one theme is. Defaults to false.
+            system_default: (Boolean) Whether the theme is the default theme of the instance. Only one theme is, so setting it on a theme takes the place of the previous one. Defaults to false.
+            uuid: (String) UUID of the theme, as export bundles reference it.
+        importStatements: []
+    superset_user:
+        subCategory: ""
+        description: Manages a user in Superset. Requires the Flask-AppBuilder security API, which Superset enables with FAB_ADD_SECURITY_API = True in superset_config.py.
+        name: superset_user
+        title: superset_user Resource - superset
+        examples:
+            - name: example_user
+              manifest: |-
+                {
+                  "active": true,
+                  "email": "example.sample@example.com",
+                  "first_name": "Example",
+                  "last_name": "Sample",
+                  "password": "ExampleSamplePass123!",
+                  "roles": [
+                    3,
+                    4
+                  ],
+                  "username": "example.user"
+                }
+        argumentDocs:
+            active: (Boolean) Whether the user is active. Defaults to true.
+            email: (String) Email address of the user.
+            first_name: (String) First name of the user.
+            id: (Number) Numeric identifier of the user.
+            last_name: (String) Last name of the user.
+            last_updated: (String) Timestamp of the last update.
+            password: (String, Sensitive) Password of the user. Required for creation, optional for updates.
+            roles: (List of Number) List of role IDs assigned to the user.
+            username: (String) Username of the user.
+        importStatements:
+            - |-
+              # User can be imported by specifying the numeric identifier of the User id
+              terraform import superset_user.example_user 213

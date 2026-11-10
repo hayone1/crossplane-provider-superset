@@ -1,0 +1,12 @@
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/role
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+  namespace: default
+spec:
+  forProvider:
+    name: Example-Role-Name

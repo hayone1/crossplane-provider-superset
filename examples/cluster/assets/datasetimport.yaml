@@ -1,0 +1,127 @@
+# This example imports a dataset with its database. Deleting the managed resource
+# deletes the dataset. The database stays.
+# e2e-update: DatasetImport/sales-datasetimport {"spec":{"forProvider":{"files":{"datasets/Warehouse_import_example/sales_1.yaml":"table_name: sales\nmain_dttm_col: day\ncurrency_code_column: null\ndescription: Changed by the end-to-end test\ndefault_endpoint: null\noffset: 0\ncache_timeout: null\ncatalog: examples\nschema: public\nsql: null\nparams: null\ntemplate_params: null\nfilter_select_enabled: true\nfetch_values_predicate: null\nextra: null\nnormalize_columns: false\nalways_filter_main_dttm: false\nfolders: null\nuuid: d75b1932-3700-4e62-83af-0cee4b8b7eac\nmetrics:\n- metric_name: count\n  verbose_name: COUNT(*)\n  metric_type: count\n  expression: COUNT(*)\n  description: null\n  d3format: null\n  currency: null\n  extra: null\n  warning_text: null\ncolumns:\n- column_name: amount\n  verbose_name: null\n  is_dttm: false\n  is_active: true\n  type: NUMERIC(10, 2)\n  advanced_data_type: null\n  groupby: true\n  filterable: true\n  expression: null\n  description: null\n  python_date_format: null\n  datetime_format: null\n  extra: null\n- column_name: day\n  verbose_name: null\n  is_dttm: true\n  is_active: true\n  type: DATE\n  advanced_data_type: null\n  groupby: true\n  filterable: true\n  expression: null\n  description: null\n  python_date_format: null\n  datetime_format: null\n  extra: null\n- column_name: id\n  verbose_name: null\n  is_dttm: false\n  is_active: true\n  type: INTEGER\n  advanced_data_type: null\n  groupby: true\n  filterable: true\n  expression: null\n  description: null\n  python_date_format: null\n  datetime_format: null\n  extra: null\n- column_name: region\n  verbose_name: null\n  is_dttm: false\n  is_active: true\n  type: TEXT\n  advanced_data_type: null\n  groupby: true\n  filterable: true\n  expression: null\n  description: null\n  python_date_format: null\n  datetime_format: null\n  extra: null\nversion: 1.0.0\ndatabase_uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c\n"}}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sales-datasetimport-db
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  # The key is the file name of the database in the bundle (databases/<file>).
+  Warehouse_import_example.yaml: examples
+---
+apiVersion: assets.superset.crossplane.io/v1alpha1
+kind: DatasetImport
+metadata:
+  name: sales-datasetimport
+spec:
+  forProvider:
+    files:
+      databases/Warehouse_import_example.yaml: |
+        database_name: Warehouse (import example)
+        sqlalchemy_uri: postgresql+psycopg2://examples:XXXXXXXXXX@postgres:5432/examples
+        cache_timeout: null
+        expose_in_sqllab: true
+        allow_run_async: false
+        allow_ctas: false
+        allow_cvas: false
+        allow_dml: false
+        allow_file_upload: false
+        extra:
+          metadata_params: {}
+          engine_params: {}
+          metadata_cache_timeout: {}
+          schemas_allowed_for_file_upload: []
+        impersonate_user: false
+        configuration_method: sqlalchemy_form
+        uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+        version: 1.0.0
+      datasets/Warehouse_import_example/sales_1.yaml: |
+        table_name: sales
+        main_dttm_col: day
+        currency_code_column: null
+        description: null
+        default_endpoint: null
+        offset: 0
+        cache_timeout: null
+        catalog: examples
+        schema: public
+        sql: null
+        params: null
+        template_params: null
+        filter_select_enabled: true
+        fetch_values_predicate: null
+        extra: null
+        normalize_columns: false
+        always_filter_main_dttm: false
+        folders: null
+        uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+        metrics:
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: null
+          d3format: null
+          currency: null
+          extra: null
+          warning_text: null
+        columns:
+        - column_name: amount
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: NUMERIC(10, 2)
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: day
+          verbose_name: null
+          is_dttm: true
+          is_active: true
+          type: DATE
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: id
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: INTEGER
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: region
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: TEXT
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        version: 1.0.0
+        database_uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+    databasePasswordsSecretRef:
+      name: sales-datasetimport-db
+      namespace: crossplane-system

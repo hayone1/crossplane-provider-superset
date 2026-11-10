@@ -1,0 +1,65 @@
+# Apache Superset and a PostgreSQL to test the provider against. See test/superset/README.md.
+#
+#   make superset.up      (or: docker network create kind; docker compose -f test/superset/compose.yaml up -d --wait)
+#
+# Superset answers on http://localhost:8088 with the account admin / admin. It also joins the
+# Docker network of kind clusters as "superset", so a provider inside kind reaches it at
+# http://superset:8088. The PostgreSQL is "postgres" on both networks. The defaults that
+# matter for the provider stay on: CSRF protection and the rate limit of the login endpoint.
+name: superset-test
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: examples
+      POSTGRES_PASSWORD: examples
+      POSTGRES_DB: examples
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+    networks: [default, kind]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U examples -d examples"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  superset:
+    image: apache/superset:${SUPERSET_VERSION:-6.1.0}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # The image has no PostgreSQL driver, and installing one needs root.
+    user: root
+    environment:
+      SUPERSET_SECRET_KEY: test-only-secret-key-do-not-use
+      SUPERSET_CONFIG_PATH: /app/config/superset_config.py
+      UV_NO_CACHE: "1"
+    ports:
+      - "127.0.0.1:${SUPERSET_PORT:-8088}:8088"
+    volumes:
+      - ./config:/app/config:ro
+    networks:
+      default:
+      kind:
+        aliases: [superset]
+    command:
+      - /bin/sh
+      - -c
+      - |
+        (uv pip install --quiet psycopg2-binary || pip install --quiet psycopg2-binary) &&
+        superset db upgrade &&
+        (superset fab create-admin --username admin --firstname Admin --lastname User --email admin@example.com --password admin || true) &&
+        superset init &&
+        exec /usr/bin/run-server.sh
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8088/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 60
+
+networks:
+  kind:
+    name: kind
+    external: true

@@ -1,0 +1,22 @@
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: RolePermissions
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/rolepermissions
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    resourcePermissions:
+    - permission: database_access
+      viewMenuSelector:
+        matchLabels:
+          testing.upbound.io/example-name: example
+    - permission: schema_access
+      viewMenuSelector:
+        matchLabels:
+          testing.upbound.io/example-name: example
+    roleNameSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example

@@ -1,0 +1,22 @@
+# Secrets and local settings
+.env
+.secrets/
+*.kubeconfig
+kubeconfig*.yaml
+
+# Scratch space for experiments
+_debug/
+
+# Build output (Upjet template)
+/.cache
+/.work
+/_output
+/results
+/bin
+cover.out
+.DS_Store
+.idea/
+
+# Terraform working files of the lab (state lives in _debug/lab)
+hack/lab/.terraform/
+*.tfstate*

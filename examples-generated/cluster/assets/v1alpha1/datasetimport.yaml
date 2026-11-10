@@ -1,0 +1,31 @@
+apiVersion: assets.superset.crossplane.io/v1alpha1
+kind: DatasetImport
+metadata:
+  annotations:
+    meta.upbound.io/example-id: assets/v1alpha1/datasetimport
+  labels:
+    testing.upbound.io/example-name: warehouse
+  name: warehouse
+spec:
+  forProvider:
+    databasePasswordsSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    source: ${path.module}/exports/warehouse
+    syncColumns: true
+    syncMetrics: true
+
+---
+
+apiVersion: assets.superset.crossplane.io/v1alpha1
+kind: ChartImport
+metadata:
+  annotations:
+    meta.upbound.io/example-id: assets/v1alpha1/datasetimport
+  labels:
+    testing.upbound.io/example-name: warehouse
+  name: warehouse
+spec:
+  forProvider:
+    source: ${path.module}/exports/warehouse

@@ -1,0 +1,137 @@
+# The manifest of docs/getting-started.md, tested as written. Keep the two in step.
+# e2e-update: Chart/revenue-by-region {"spec":{"forProvider":{"name":"Revenue per region"}}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: analytics
+---
+# The password of the database user. The Database below reads it from here, so it never
+# appears in the Database object.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: warehouse-db
+  namespace: analytics
+stringData:
+  password: examples
+---
+# The connection from Superset to the database. Superset tests the connection when the
+# provider creates it, so a wrong host or password shows up as an error here.
+apiVersion: database.superset.m.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: warehouse
+  namespace: analytics
+spec:
+  forProvider:
+    connectionName: Warehouse
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef: {name: warehouse-db, key: password}
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+---
+# A dataset for the table public.sales. databaseNameRef fills in the name of the
+# connection above, once Superset has it.
+apiVersion: dataset.superset.m.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  name: sales
+  namespace: analytics
+spec:
+  forProvider:
+    databaseNameRef: {name: warehouse}
+    schema: public
+    tableName: sales
+    metrics:
+      - metricName: count
+        expression: COUNT(*)
+      - metricName: revenue
+        expression: SUM(amount)
+        d3format: ",.2f"
+---
+# A table of the revenue per region.
+apiVersion: chart.superset.m.crossplane.io/v1alpha1
+kind: Chart
+metadata:
+  name: revenue-by-region
+  namespace: analytics
+spec:
+  forProvider:
+    name: Revenue by region
+    vizType: table
+    datasourceIdRef: {name: sales}
+    params: |
+      {"viz_type": "table", "query_mode": "aggregate", "groupby": ["region"], "metrics": ["revenue"], "row_limit": 100}
+---
+# A role for the people who read the sales numbers, and the permissions of the role.
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  name: sales-readers
+  namespace: analytics
+spec:
+  forProvider:
+    name: Sales readers
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: RolePermissions
+metadata:
+  name: sales-readers
+  namespace: analytics
+spec:
+  forProvider:
+    roleNameRef: {name: sales-readers}
+    resourcePermissions:
+      - {permission: can_read, viewMenu: Dashboard}
+      - {permission: can_read, viewMenu: Chart}
+      - {permission: menu_access, viewMenu: Dashboards}
+      # The permission to read the sales dataset. viewMenuRef fills in the name that
+      # Superset gives the dataset's permission.
+      - permission: datasource_access
+        viewMenuRef: {name: sales}
+---
+# A dashboard. Its roles decide who may see it when Superset has the feature flag
+# DASHBOARD_RBAC; without the flag, the permissions of the role decide.
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: Dashboard
+metadata:
+  name: sales
+  namespace: analytics
+spec:
+  forProvider:
+    title: Sales
+    slug: sales
+    published: true
+    rolesRefs:
+      - name: sales-readers
+---
+# A user with the role. The password comes from a Secret.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dana-password
+  namespace: analytics
+stringData:
+  password: Change-me-1234
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  name: dana
+  namespace: analytics
+spec:
+  forProvider:
+    username: dana
+    firstName: Dana
+    lastName: Reader
+    email: dana@example.com
+    passwordSecretRef: {name: dana-password, key: password}
+    rolesRefs:
+      - name: sales-readers

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">provider-superset: dashboards kept in sync by a reconcile loop</title>
+  <rect width="256" height="256" rx="56" fill="#1B2A41"/>
+  <path d="M172 51.8A88 88 0 1 1 84 51.8" fill="none" stroke="#7DD3FC" stroke-width="14" stroke-linecap="round"/>
+  <path d="M101 41.5 74.5 39.2 86.8 65.5Z" fill="#7DD3FC"/>
+  <rect x="70" y="86" width="116" height="84" rx="10" fill="#F1F5F9"/>
+  <rect x="86" y="132" width="16" height="26" rx="3" fill="#1B2A41"/>
+  <rect x="110" y="114" width="16" height="44" rx="3" fill="#1B2A41"/>
+  <rect x="134" y="122" width="16" height="36" rx="3" fill="#1B2A41"/>
+  <rect x="158" y="100" width="16" height="58" rx="3" fill="#F59E0B"/>
+</svg>

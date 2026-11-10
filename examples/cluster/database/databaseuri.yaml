@@ -1,0 +1,27 @@
+# This example creates a database connection from one SQLAlchemy URI. The URI holds the password,
+# so the URI comes from a Secret.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: warehouse-uri
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  uri: postgresql+psycopg2://examples:examples@postgres:5432/examples
+---
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: warehouse-uri
+spec:
+  forProvider:
+    connectionName: Warehouse (URI example)
+    sqlalchemyUriSecretRef:
+      name: warehouse-uri
+      namespace: crossplane-system
+      key: uri
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false

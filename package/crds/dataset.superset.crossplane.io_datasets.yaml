@@ -1,0 +1,1115 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.23.0
+  name: datasets.dataset.superset.crossplane.io
+spec:
+  group: dataset.superset.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - superset
+    kind: Dataset
+    listKind: DatasetList
+    plural: datasets
+    singular: dataset
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .metadata.annotations.crossplane\.io/external-name
+      name: EXTERNAL-NAME
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: 'Dataset is the Schema for the Datasets API. Manages a dataset:
+          a table of a database, or a virtual dataset defined by a SQL query. Superset
+          detects the columns of the dataset and creates its count metric itself;
+          columns and metrics take them over when set. To manage an existing object,
+          set the crossplane.io/external-name annotation to its numeric ID.'
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DatasetSpec defines the desired state of Dataset
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: |-
+                  DeletionPolicy specifies what will happen to the underlying external
+                  when this managed resource is deleted - either "Delete" or "Orphan" the
+                  external resource.
+                  This field is planned to be deprecated in favor of the ManagementPolicies
+                  field in a future release. Currently, both could be set independently and
+                  non-default values would be honored if the feature flag is enabled.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                properties:
+                  alwaysFilterMainDttm:
+                    description: |-
+                      (Boolean) Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to false.
+                      Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to `false`.
+                    type: boolean
+                  cacheTimeout:
+                    description: |-
+                      (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                      Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                    type: number
+                  columns:
+                    description: (Attributes Set) Columns of the dataset. When unset,
+                      the columns are left to Superset, which detects them from the
+                      source. When set, the dataset has exactly these columns, and
+                      columns not listed here are deleted. Within a column, only the
+                      attributes that are set are written, so the others keep the
+                      value Superset has, such as the detected type; an empty string
+                      clears an attribute. (see below for nested schema)
+                    items:
+                      properties:
+                        columnName:
+                          description: |-
+                            (String) Name of the column, unique within the dataset.
+                            Name of the column, unique within the dataset.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the column.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL expression of a calculated column, for example `amount * 100`.
+                          type: string
+                        filterable:
+                          description: |-
+                            (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
+                            Whether the column can be used in a filter. Defaults to `true` in Superset.
+                          type: boolean
+                        groupby:
+                          description: |-
+                            (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
+                            Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isDttm:
+                          description: |-
+                            (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                            Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                          type: boolean
+                        pythonDateFormat:
+                          description: |-
+                            %m-%d, or epoch_s.
+                            Format of the values of a datetime column stored as text, for example `%Y-%m-%d`, or `epoch_s`.
+                          type: string
+                        type:
+                          description: |-
+                            (String) Data type of the column, for example NUMERIC. Superset detects it for the columns of the source; set it for a calculated column.
+                            Data type of the column, for example `NUMERIC`. Superset detects it for the columns of the source; set it for a calculated column.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                      type: object
+                    type: array
+                  databaseName:
+                    description: |-
+                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                    type: string
+                  databaseNameRef:
+                    description: Reference to a Database in database to populate databaseName.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  databaseNameSelector:
+                    description: Selector for a Database in database to populate databaseName.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  defaultEndpoint:
+                    description: |-
+                      (String) URL Superset redirects to when the dataset is opened.
+                      URL Superset redirects to when the dataset is opened.
+                    type: string
+                  description:
+                    description: |-
+                      text description of the dataset.
+                      Free-text description of the dataset.
+                    type: string
+                  extra:
+                    description: |-
+                      (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                      JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
+                    type: string
+                  fetchValuesPredicate:
+                    description: |-
+                      (String) SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                      SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                    type: string
+                  filterSelectEnabled:
+                    description: |-
+                      (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
+                      Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
+                    type: boolean
+                  mainDttmCol:
+                    description: |-
+                      (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                      Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                    type: string
+                  metrics:
+                    description: '(Attributes Set) Metrics of the dataset. When unset,
+                      the metrics are left to Superset, which creates count with every
+                      dataset. When set, the dataset has exactly these metrics: declare
+                      count too if it should stay, and metrics not listed here are
+                      deleted. (see below for nested schema)'
+                    items:
+                      properties:
+                        d3format:
+                          description: |-
+                            (String) D3 format of the values, for example,.2f.
+                            D3 format of the values, for example `,.2f`.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the metric.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL aggregate expression of the metric, for example `SUM(amount)`.
+                          type: string
+                        metricName:
+                          description: |-
+                            (String) Name of the metric, unique within the dataset.
+                            Name of the metric, unique within the dataset.
+                          type: string
+                        metricType:
+                          description: |-
+                            (String) Type of the aggregate, for example sum or count; informational.
+                            Type of the aggregate, for example `sum` or `count`; informational.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                        warningText:
+                          description: |-
+                            (String) Warning shown next to the metric.
+                            Warning shown next to the metric.
+                          type: string
+                      type: object
+                    type: array
+                  normalizeColumns:
+                    description: |-
+                      (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
+                      Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
+                    type: boolean
+                  owners:
+                    description: |-
+                      (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                      Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
+                  ownersRefs:
+                    description: References to User in security to populate owners.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  ownersSelector:
+                    description: Selector for a list of User in security to populate
+                      owners.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  schema:
+                    description: |-
+                      (String) Schema of the table.
+                      Schema of the table.
+                    type: string
+                  sql:
+                    description: |-
+                      (String) SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the ENABLE_TEMPLATE_PROCESSING feature flag, and on Superset 3.1, whose create endpoint does not take template_params, their parameters need a default such as {{ region | default('eu') }}.
+                      SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the `ENABLE_TEMPLATE_PROCESSING` feature flag, and on Superset 3.1, whose create endpoint does not take `template_params`, their parameters need a default such as `{{ region | default('eu') }}`.
+                    type: string
+                  tableName:
+                    description: |-
+                      (String) Name of the table, or name of the virtual dataset.
+                      Name of the table, or name of the virtual dataset.
+                    type: string
+                  templateParams:
+                    description: |-
+                      (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                      JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                    type: string
+                type: object
+              initProvider:
+                description: |-
+                  THIS IS A BETA FIELD. It will be honored
+                  unless the Management Policies feature flag is disabled.
+                  InitProvider holds the same fields as ForProvider, with the exception
+                  of Identifier and other resource reference fields. The fields that are
+                  in InitProvider are merged into ForProvider when the resource is created.
+                  The same fields are also added to the terraform ignore_changes hook, to
+                  avoid updating them after creation. This is useful for fields that are
+                  required on creation, but we do not desire to update them after creation,
+                  for example because of an external controller is managing them, like an
+                  autoscaler.
+                properties:
+                  alwaysFilterMainDttm:
+                    description: |-
+                      (Boolean) Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to false.
+                      Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to `false`.
+                    type: boolean
+                  cacheTimeout:
+                    description: |-
+                      (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                      Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                    type: number
+                  columns:
+                    description: (Attributes Set) Columns of the dataset. When unset,
+                      the columns are left to Superset, which detects them from the
+                      source. When set, the dataset has exactly these columns, and
+                      columns not listed here are deleted. Within a column, only the
+                      attributes that are set are written, so the others keep the
+                      value Superset has, such as the detected type; an empty string
+                      clears an attribute. (see below for nested schema)
+                    items:
+                      properties:
+                        columnName:
+                          description: |-
+                            (String) Name of the column, unique within the dataset.
+                            Name of the column, unique within the dataset.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the column.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL expression of a calculated column, for example `amount * 100`.
+                          type: string
+                        filterable:
+                          description: |-
+                            (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
+                            Whether the column can be used in a filter. Defaults to `true` in Superset.
+                          type: boolean
+                        groupby:
+                          description: |-
+                            (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
+                            Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isDttm:
+                          description: |-
+                            (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                            Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                          type: boolean
+                        pythonDateFormat:
+                          description: |-
+                            %m-%d, or epoch_s.
+                            Format of the values of a datetime column stored as text, for example `%Y-%m-%d`, or `epoch_s`.
+                          type: string
+                        type:
+                          description: |-
+                            (String) Data type of the column, for example NUMERIC. Superset detects it for the columns of the source; set it for a calculated column.
+                            Data type of the column, for example `NUMERIC`. Superset detects it for the columns of the source; set it for a calculated column.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                      type: object
+                    type: array
+                  databaseName:
+                    description: |-
+                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                    type: string
+                  databaseNameRef:
+                    description: Reference to a Database in database to populate databaseName.
+                    properties:
+                      name:
+                        description: Name of the referenced object.
+                        type: string
+                      policy:
+                        description: Policies for referencing.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    required:
+                    - name
+                    type: object
+                  databaseNameSelector:
+                    description: Selector for a Database in database to populate databaseName.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  defaultEndpoint:
+                    description: |-
+                      (String) URL Superset redirects to when the dataset is opened.
+                      URL Superset redirects to when the dataset is opened.
+                    type: string
+                  description:
+                    description: |-
+                      text description of the dataset.
+                      Free-text description of the dataset.
+                    type: string
+                  extra:
+                    description: |-
+                      (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                      JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
+                    type: string
+                  fetchValuesPredicate:
+                    description: |-
+                      (String) SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                      SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                    type: string
+                  filterSelectEnabled:
+                    description: |-
+                      (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
+                      Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
+                    type: boolean
+                  mainDttmCol:
+                    description: |-
+                      (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                      Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                    type: string
+                  metrics:
+                    description: '(Attributes Set) Metrics of the dataset. When unset,
+                      the metrics are left to Superset, which creates count with every
+                      dataset. When set, the dataset has exactly these metrics: declare
+                      count too if it should stay, and metrics not listed here are
+                      deleted. (see below for nested schema)'
+                    items:
+                      properties:
+                        d3format:
+                          description: |-
+                            (String) D3 format of the values, for example,.2f.
+                            D3 format of the values, for example `,.2f`.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the metric.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL aggregate expression of the metric, for example `SUM(amount)`.
+                          type: string
+                        metricName:
+                          description: |-
+                            (String) Name of the metric, unique within the dataset.
+                            Name of the metric, unique within the dataset.
+                          type: string
+                        metricType:
+                          description: |-
+                            (String) Type of the aggregate, for example sum or count; informational.
+                            Type of the aggregate, for example `sum` or `count`; informational.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                        warningText:
+                          description: |-
+                            (String) Warning shown next to the metric.
+                            Warning shown next to the metric.
+                          type: string
+                      type: object
+                    type: array
+                  normalizeColumns:
+                    description: |-
+                      (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
+                      Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
+                    type: boolean
+                  owners:
+                    description: |-
+                      (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                      Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
+                  ownersRefs:
+                    description: References to User in security to populate owners.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  ownersSelector:
+                    description: Selector for a list of User in security to populate
+                      owners.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
+                  schema:
+                    description: |-
+                      (String) Schema of the table.
+                      Schema of the table.
+                    type: string
+                  sql:
+                    description: |-
+                      (String) SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the ENABLE_TEMPLATE_PROCESSING feature flag, and on Superset 3.1, whose create endpoint does not take template_params, their parameters need a default such as {{ region | default('eu') }}.
+                      SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the `ENABLE_TEMPLATE_PROCESSING` feature flag, and on Superset 3.1, whose create endpoint does not take `template_params`, their parameters need a default such as `{{ region | default('eu') }}`.
+                    type: string
+                  tableName:
+                    description: |-
+                      (String) Name of the table, or name of the virtual dataset.
+                      Name of the table, or name of the virtual dataset.
+                    type: string
+                  templateParams:
+                    description: |-
+                      (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                      JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                    type: string
+                type: object
+              managementPolicies:
+                default:
+                - '*'
+                description: |-
+                  THIS IS A BETA FIELD. It is on by default but can be opted out
+                  through a Crossplane feature flag.
+                  ManagementPolicies specify the array of actions Crossplane is allowed to
+                  take on the managed and external resources.
+                  This field is planned to replace the DeletionPolicy field in a future
+                  release. Currently, both could be set independently and non-default
+                  values would be honored if the feature flag is enabled. If both are
+                  custom, the DeletionPolicy field will be ignored.
+                  See the design doc for more information: https://github.com/crossplane/crossplane/blob/499895a25d1a1a0ba1604944ef98ac7a1a71f197/design/design-doc-observe-only-resources.md?plain=1#L223
+                  and this one: https://github.com/crossplane/crossplane/blob/444267e84783136daa93568b364a5f01228cacbe/design/one-pager-ignore-changes.md
+                items:
+                  description: |-
+                    A ManagementAction represents an action that the Crossplane controllers
+                    can take on an external resource.
+                  enum:
+                  - Observe
+                  - Create
+                  - Update
+                  - Delete
+                  - LateInitialize
+                  - '*'
+                  type: string
+                type: array
+              providerConfigRef:
+                default:
+                  name: default
+                description: |-
+                  ProviderConfigReference specifies how the provider that will be used to
+                  create, observe, update, and delete this managed resource should be
+                  configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                  policy:
+                    description: Policies for referencing.
+                    properties:
+                      resolution:
+                        default: Required
+                        description: |-
+                          Resolution specifies whether resolution of this reference is required.
+                          The default is 'Required', which means the reconcile will fail if the
+                          reference cannot be resolved. 'Optional' means this reference will be
+                          a no-op if it cannot be resolved.
+                        enum:
+                        - Required
+                        - Optional
+                        type: string
+                      resolve:
+                        description: |-
+                          Resolve specifies when this reference should be resolved. The default
+                          is 'IfNotPresent', which will attempt to resolve the reference only when
+                          the corresponding field is not present. Use 'Always' to resolve the
+                          reference on every reconcile.
+                        enum:
+                        - Always
+                        - IfNotPresent
+                        type: string
+                    type: object
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: |-
+                  WriteConnectionSecretToReference specifies the namespace and name of a
+                  Secret to which any connection details for this managed resource should
+                  be written. Connection details frequently include the endpoint, username,
+                  and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+            x-kubernetes-validations:
+            - message: spec.forProvider.tableName is a required parameter
+              rule: '!(''*'' in self.managementPolicies || ''Create'' in self.managementPolicies
+                || ''Update'' in self.managementPolicies) || has(self.forProvider.tableName)
+                || (has(self.initProvider) && has(self.initProvider.tableName))'
+          status:
+            description: DatasetStatus defines the observed state of Dataset.
+            properties:
+              atProvider:
+                properties:
+                  alwaysFilterMainDttm:
+                    description: |-
+                      (Boolean) Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to false.
+                      Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to `false`.
+                    type: boolean
+                  cacheTimeout:
+                    description: |-
+                      (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                      Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+                    type: number
+                  columns:
+                    description: (Attributes Set) Columns of the dataset. When unset,
+                      the columns are left to Superset, which detects them from the
+                      source. When set, the dataset has exactly these columns, and
+                      columns not listed here are deleted. Within a column, only the
+                      attributes that are set are written, so the others keep the
+                      value Superset has, such as the detected type; an empty string
+                      clears an attribute. (see below for nested schema)
+                    items:
+                      properties:
+                        columnName:
+                          description: |-
+                            (String) Name of the column, unique within the dataset.
+                            Name of the column, unique within the dataset.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the column.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL expression of a calculated column, for example `amount * 100`.
+                          type: string
+                        filterable:
+                          description: |-
+                            (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
+                            Whether the column can be used in a filter. Defaults to `true` in Superset.
+                          type: boolean
+                        groupby:
+                          description: |-
+                            (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
+                            Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isDttm:
+                          description: |-
+                            (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                            Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+                          type: boolean
+                        pythonDateFormat:
+                          description: |-
+                            %m-%d, or epoch_s.
+                            Format of the values of a datetime column stored as text, for example `%Y-%m-%d`, or `epoch_s`.
+                          type: string
+                        type:
+                          description: |-
+                            (String) Data type of the column, for example NUMERIC. Superset detects it for the columns of the source; set it for a calculated column.
+                            Data type of the column, for example `NUMERIC`. Superset detects it for the columns of the source; set it for a calculated column.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                      type: object
+                    type: array
+                  databaseName:
+                    description: |-
+                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                    type: string
+                  defaultEndpoint:
+                    description: |-
+                      (String) URL Superset redirects to when the dataset is opened.
+                      URL Superset redirects to when the dataset is opened.
+                    type: string
+                  description:
+                    description: |-
+                      text description of the dataset.
+                      Free-text description of the dataset.
+                    type: string
+                  extra:
+                    description: |-
+                      (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                      JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
+                    type: string
+                  fetchValuesPredicate:
+                    description: |-
+                      (String) SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                      SQL predicate applied when Superset fetches the distinct values of a column for a filter.
+                    type: string
+                  filterSelectEnabled:
+                    description: |-
+                      (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
+                      Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
+                    type: boolean
+                  id:
+                    description: (Number) Numeric identifier of the dataset.
+                    type: string
+                  mainDttmCol:
+                    description: |-
+                      (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                      Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
+                    type: string
+                  metrics:
+                    description: '(Attributes Set) Metrics of the dataset. When unset,
+                      the metrics are left to Superset, which creates count with every
+                      dataset. When set, the dataset has exactly these metrics: declare
+                      count too if it should stay, and metrics not listed here are
+                      deleted. (see below for nested schema)'
+                    items:
+                      properties:
+                        d3format:
+                          description: |-
+                            (String) D3 format of the values, for example,.2f.
+                            D3 format of the values, for example `,.2f`.
+                          type: string
+                        description:
+                          description: |-
+                            text description of the dataset.
+                            Free-text description of the metric.
+                          type: string
+                        expression:
+                          description: |-
+                            (String) SQL expression of a calculated column, for example amount * 100.
+                            SQL aggregate expression of the metric, for example `SUM(amount)`.
+                          type: string
+                        metricName:
+                          description: |-
+                            (String) Name of the metric, unique within the dataset.
+                            Name of the metric, unique within the dataset.
+                          type: string
+                        metricType:
+                          description: |-
+                            (String) Type of the aggregate, for example sum or count; informational.
+                            Type of the aggregate, for example `sum` or `count`; informational.
+                          type: string
+                        verboseName:
+                          description: |-
+                            (String) Label shown instead of the name.
+                            Label shown instead of the name.
+                          type: string
+                        warningText:
+                          description: |-
+                            (String) Warning shown next to the metric.
+                            Warning shown next to the metric.
+                          type: string
+                      type: object
+                    type: array
+                  normalizeColumns:
+                    description: |-
+                      (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
+                      Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
+                    type: boolean
+                  owners:
+                    description: |-
+                      (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                      Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
+                  perm:
+                    description: |-
+                      (String) View menu of the datasource_access permission of the dataset, [<database>].[<table>](id:<id>), for RolePermissions.
+                      View menu of the `datasource_access` permission of the dataset, `[<database>].[<table>](id:<id>)`, for `superset_role_permissions`.
+                    type: string
+                  schema:
+                    description: |-
+                      (String) Schema of the table.
+                      Schema of the table.
+                    type: string
+                  schemaPerm:
+                    description: |-
+                      (String) View menu of the schema_access permission of the schema of the dataset, [<database>].[<schema>]; null without a schema.
+                      View menu of the `schema_access` permission of the schema of the dataset, `[<database>].[<schema>]`; null without a schema.
+                    type: string
+                  sql:
+                    description: |-
+                      (String) SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the ENABLE_TEMPLATE_PROCESSING feature flag, and on Superset 3.1, whose create endpoint does not take template_params, their parameters need a default such as {{ region | default('eu') }}.
+                      SQL query of a virtual dataset. Superset runs it when the dataset is created to detect the columns, so it must be valid at that time: Jinja templates need the `ENABLE_TEMPLATE_PROCESSING` feature flag, and on Superset 3.1, whose create endpoint does not take `template_params`, their parameters need a default such as `{{ region | default('eu') }}`.
+                    type: string
+                  tableName:
+                    description: |-
+                      (String) Name of the table, or name of the virtual dataset.
+                      Name of the table, or name of the virtual dataset.
+                    type: string
+                  templateParams:
+                    description: |-
+                      (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                      JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastHandledReconcileAt:
+                description: |-
+                  LastHandledReconcileAt holds the value of the most recent
+                  reconcile-requested-at annotation token that the controller has
+                  processed. Users can compare this to the annotation to determine
+                  whether a reconcile request has been handled.
+                type: string
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the latest metadata.generation
+                  which resulted in either a ready state, or stalled due to error
+                  it can not recover from without human intervention.
+                format: int64
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

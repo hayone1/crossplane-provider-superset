@@ -1,0 +1,26 @@
+# A ProviderConfig for the namespaced managed resources of one namespace, for example a team
+# that manages its own Superset. Managed resources use it with
+#   providerConfigRef: {kind: ProviderConfig, name: team-superset}
+# It reads the Secret from its own namespace.
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: analytics
+  name: team-superset-creds
+type: Opaque
+stringData:
+  credentials: |
+    {"host": "https://team-superset.example.com", "username": "crossplane", "password": "change-me"}
+---
+apiVersion: superset.m.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  namespace: analytics
+  name: team-superset
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: analytics
+      name: team-superset-creds
+      key: credentials

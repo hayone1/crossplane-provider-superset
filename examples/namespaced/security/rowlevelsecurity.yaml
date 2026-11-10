@@ -1,0 +1,71 @@
+# This example creates a row level security rule. Users with the role see only the rows of the
+# north region.
+# e2e-update: RowLevelSecurity/north-only {"spec":{"forProvider":{"clause":"region = 'south'"}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: rls-db-db
+type: Opaque
+stringData:
+  password: examples
+---
+apiVersion: database.superset.m.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  namespace: default
+  name: rls-db
+spec:
+  forProvider:
+    connectionName: Warehouse (row level security example)
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef:
+      name: rls-db-db
+      key: password
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+---
+apiVersion: dataset.superset.m.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  namespace: default
+  name: rls-sales
+spec:
+  forProvider:
+    databaseNameRef:
+      name: rls-db
+    schema: public
+    tableName: sales
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  namespace: default
+  name: north-analysts
+spec:
+  forProvider:
+    name: North analysts (example)
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: RowLevelSecurity
+metadata:
+  namespace: default
+  name: north-only
+spec:
+  forProvider:
+    name: North only (example)
+    description: Analysts of the north see their region
+    filterType: Regular
+    clause: region = 'north'
+    groupKey: region
+    rolesRefs:
+      - name: north-analysts
+    tablesRefs:
+      - name: rls-sales

@@ -1,0 +1,31 @@
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: Group
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/group
+  labels:
+    testing.upbound.io/example-name: finance
+  name: finance
+spec:
+  forProvider:
+    description: The finance team
+    label: Finance
+    name: finance
+    rolesRefs:
+    - name: analysts
+    usersRefs:
+    - name: alice
+
+---
+
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/group
+  labels:
+    testing.upbound.io/example-name: analysts
+  name: analysts
+spec:
+  forProvider:
+    name: Analysts

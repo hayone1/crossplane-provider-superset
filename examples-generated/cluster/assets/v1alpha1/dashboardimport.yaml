@@ -1,0 +1,15 @@
+apiVersion: assets.superset.crossplane.io/v1alpha1
+kind: DashboardImport
+metadata:
+  annotations:
+    meta.upbound.io/example-id: assets/v1alpha1/dashboardimport
+  labels:
+    testing.upbound.io/example-name: signups
+  name: signups
+spec:
+  forProvider:
+    databasePasswordsSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    source: ${path.module}/exports/signups

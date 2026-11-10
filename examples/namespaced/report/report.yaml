@@ -1,0 +1,77 @@
+# This example schedules a weekly email report of a chart. Superset sends the report only when its
+# workers run (Celery beat and a worker) and SMTP is set up. The managed resource only schedules
+# the report.
+# e2e-update: Report/weekly-sales {"spec":{"forProvider":{"crontab":"0 8 * * 1","active":false}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: report-db-db
+type: Opaque
+stringData:
+  password: examples
+---
+apiVersion: database.superset.m.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  namespace: default
+  name: report-db
+spec:
+  forProvider:
+    connectionName: Warehouse (report example)
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef:
+      name: report-db-db
+      key: password
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+---
+apiVersion: dataset.superset.m.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  namespace: default
+  name: report-sales
+spec:
+  forProvider:
+    databaseNameRef:
+      name: report-db
+    schema: public
+    tableName: sales
+---
+apiVersion: chart.superset.m.crossplane.io/v1alpha1
+kind: Chart
+metadata:
+  namespace: default
+  name: report-chart
+spec:
+  forProvider:
+    name: Sales for the weekly report (example)
+    vizType: table
+    datasourceIdRef:
+      name: report-sales
+    params: |
+      {"viz_type": "table", "query_mode": "aggregate", "groupby": ["region"], "metrics": ["count"], "row_limit": 100}
+---
+apiVersion: report.superset.m.crossplane.io/v1alpha1
+kind: Report
+metadata:
+  namespace: default
+  name: weekly-sales
+spec:
+  forProvider:
+    name: Weekly sales (example)
+    type: Report
+    crontab: 0 9 * * 1
+    timezone: Europe/Berlin
+    chartIdRef:
+      name: report-chart
+    recipients:
+      - type: Email
+        target: sales@example.com

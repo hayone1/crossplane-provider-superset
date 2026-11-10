@@ -1,0 +1,12 @@
+# This example creates a tag that charts and dashboards can carry. Superset needs the feature flag
+# TAGGING_SYSTEM.
+# e2e-update: Tag/finance {"spec":{"forProvider":{"description":"Owned by the finance team (updated)"}}}
+apiVersion: tag.superset.m.crossplane.io/v1alpha1
+kind: Tag
+metadata:
+  namespace: default
+  name: finance
+spec:
+  forProvider:
+    name: finance-example
+    description: Owned by the finance team

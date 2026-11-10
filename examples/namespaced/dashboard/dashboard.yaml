@@ -1,0 +1,29 @@
+# This example creates a dashboard with its settings, and a role that may see it. The roles of a
+# dashboard decide who may see it when Superset has the feature flag DASHBOARD_RBAC. To place
+# charts on a dashboard, its positionJson names their IDs. A static manifest cannot know the IDs.
+# A Composition can fill them in, or you can use DashboardImport with an export (see
+# docs/dashboards.md).
+# e2e-update: Dashboard/sales {"spec":{"forProvider":{"title":"Sales (example, renamed)","published":false}}}
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  namespace: default
+  name: dashboard-viewers
+spec:
+  forProvider:
+    name: Dashboard viewers (example)
+---
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: Dashboard
+metadata:
+  namespace: default
+  name: sales
+spec:
+  forProvider:
+    title: Sales (example)
+    slug: sales-example
+    published: true
+    rolesRefs:
+      - name: dashboard-viewers
+    jsonMetadata: |
+      {"refresh_frequency": 300, "color_scheme": "supersetColors"}

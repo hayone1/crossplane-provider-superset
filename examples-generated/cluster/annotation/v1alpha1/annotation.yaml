@@ -1,0 +1,32 @@
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: Annotation
+metadata:
+  annotations:
+    meta.upbound.io/example-id: annotation/v1alpha1/annotation
+  labels:
+    testing.upbound.io/example-name: v2
+  name: v2
+spec:
+  forProvider:
+    endDttm: 2026-01-15T09:00:00
+    layerIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: releases
+    longDescr: New checkout flow
+    shortDescr: v2.0.0
+    startDttm: 2026-01-15T09:00:00
+
+---
+
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: AnnotationLayer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: annotation/v1alpha1/annotation
+  labels:
+    testing.upbound.io/example-name: releases
+  name: releases
+spec:
+  forProvider:
+    description: Production releases
+    name: Releases

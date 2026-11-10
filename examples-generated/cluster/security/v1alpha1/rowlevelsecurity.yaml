@@ -1,0 +1,19 @@
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: RowLevelSecurity
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/rowlevelsecurity
+  labels:
+    testing.upbound.io/example-name: emea_only
+  name: emea-only
+spec:
+  forProvider:
+    clause: region = 'EMEA'
+    description: Analysts see their own region
+    filterType: Regular
+    groupKey: region
+    name: EMEA only
+    rolesRefs:
+    - name: superset_role
+    tablesRefs:
+    - name: sales

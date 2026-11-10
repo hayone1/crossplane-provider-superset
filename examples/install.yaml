@@ -1,0 +1,7 @@
+# Installs the provider. Replace the version with the latest release.
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-superset
+spec:
+  package: ghcr.io/hayone1/provider-superset:v0.1.0

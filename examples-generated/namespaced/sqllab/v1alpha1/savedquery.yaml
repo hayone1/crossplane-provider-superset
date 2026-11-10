@@ -1,0 +1,19 @@
+apiVersion: sqllab.superset.m.crossplane.io/v1alpha1
+kind: SavedQuery
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sqllab/v1alpha1/savedquery
+  labels:
+    testing.upbound.io/example-name: daily_signups
+  name: daily-signups
+  namespace: default
+spec:
+  forProvider:
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: analytics
+    description: Signups per day, parameterised by date
+    label: Daily signups
+    schema: public
+    sql: SELECT count(*) FROM signups WHERE day = '{{ day }}'
+    templateParameters: ${jsonencode({ day = "2026-01-01" })}

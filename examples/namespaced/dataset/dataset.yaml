@@ -1,0 +1,69 @@
+# This example creates a dataset on the table public.sales, with a calculated column and two
+# metrics. Without columns and metrics, Superset keeps the ones that it detects. With them, the
+# managed resource owns the columns and the metrics.
+# e2e-update: Dataset/sales {"spec":{"forProvider":{"description":"One row per sale (updated)","cacheTimeout":600}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: sales-db-db
+type: Opaque
+stringData:
+  password: examples
+---
+apiVersion: database.superset.m.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  namespace: default
+  name: sales-db
+spec:
+  forProvider:
+    connectionName: Warehouse (dataset example)
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef:
+      name: sales-db-db
+      key: password
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+---
+apiVersion: dataset.superset.m.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  namespace: default
+  name: sales
+spec:
+  forProvider:
+    databaseNameRef:
+      name: sales-db
+    schema: public
+    tableName: sales
+    description: One row per sale
+    mainDttmCol: day
+    columns:
+      - columnName: id
+      - columnName: region
+        verboseName: Region
+        groupby: true
+        filterable: true
+      - columnName: amount
+        verboseName: Amount
+      - columnName: day
+        isDttm: true
+      - columnName: amount_cents
+        expression: amount * 100
+        type: NUMERIC
+    metrics:
+      - metricName: count
+        expression: COUNT(*)
+        verboseName: Sales
+      - metricName: revenue
+        expression: SUM(amount)
+        verboseName: Revenue
+        d3format: ",.2f"

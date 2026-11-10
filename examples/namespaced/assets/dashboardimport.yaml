@@ -1,0 +1,197 @@
+# This example imports a dashboard with its chart, dataset and database. Deleting the
+# managed resource deletes the dashboard. The chart, the dataset and the database stay.
+# e2e-update: DashboardImport/sales-dashboardimport {"spec":{"forProvider":{"files":{"dashboards/Sales_import_example_1.yaml":"dashboard_title: Sales (import example)\ndescription: Changed by the end-to-end test\ncss: null\nslug: sales-import-example\ncertified_by: null\ncertification_details: null\npublished: true\nuuid: d4e0800b-5c7b-46b5-b51b-9abb4dfbe426\nposition:\n  DASHBOARD_VERSION_KEY: v2\n  ROOT_ID:\n    type: ROOT\n    id: ROOT_ID\n    children:\n    - GRID_ID\n  GRID_ID:\n    type: GRID\n    id: GRID_ID\n    parents:\n    - ROOT_ID\n    children:\n    - ROW-N-ASTGRSR7\n  ROW-N-ASTGRSR7:\n    children:\n    - CHART-L8CDLZD2\n    id: ROW-N-ASTGRSR7\n    meta:\n      background: BACKGROUND_TRANSPARENT\n    type: ROW\n    parents:\n    - ROOT_ID\n    - GRID_ID\n  CHART-L8CDLZD2:\n    children: []\n    id: CHART-L8CDLZD2\n    meta:\n      height: 50\n      sliceName: Sales by region (import example)\n      uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b\n      width: 4\n      chartId: 1\n    type: CHART\n    parents:\n    - ROOT_ID\n    - GRID_ID\n    - ROW-N-ASTGRSR7\ntheme_uuid: null\nversion: 1.0.0\ntags: []\n"}}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: sales-dashboardimport-db
+type: Opaque
+stringData:
+  # The key is the file name of the database in the bundle (databases/<file>).
+  Warehouse_import_example.yaml: examples
+---
+apiVersion: assets.superset.m.crossplane.io/v1alpha1
+kind: DashboardImport
+metadata:
+  namespace: default
+  name: sales-dashboardimport
+spec:
+  forProvider:
+    files:
+      charts/Sales_by_region_import_example_1.yaml: |
+        slice_name: Sales by region (import example)
+        description: null
+        certified_by: null
+        certification_details: null
+        viz_type: table
+        params:
+          viz_type: table
+          query_mode: aggregate
+          groupby:
+          - region
+          metrics:
+          - count
+          row_limit: 100
+        query_context: null
+        cache_timeout: null
+        uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b
+        version: 1.0.0
+        dataset_uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+        tags: []
+      dashboards/Sales_import_example_1.yaml: |
+        dashboard_title: Sales (import example)
+        description: null
+        css: null
+        slug: sales-import-example
+        certified_by: null
+        certification_details: null
+        published: true
+        uuid: d4e0800b-5c7b-46b5-b51b-9abb4dfbe426
+        position:
+          DASHBOARD_VERSION_KEY: v2
+          ROOT_ID:
+            type: ROOT
+            id: ROOT_ID
+            children:
+            - GRID_ID
+          GRID_ID:
+            type: GRID
+            id: GRID_ID
+            parents:
+            - ROOT_ID
+            children:
+            - ROW-N-ASTGRSR7
+          ROW-N-ASTGRSR7:
+            children:
+            - CHART-L8CDLZD2
+            id: ROW-N-ASTGRSR7
+            meta:
+              background: BACKGROUND_TRANSPARENT
+            type: ROW
+            parents:
+            - ROOT_ID
+            - GRID_ID
+          CHART-L8CDLZD2:
+            children: []
+            id: CHART-L8CDLZD2
+            meta:
+              height: 50
+              sliceName: Sales by region (import example)
+              uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b
+              width: 4
+              chartId: 1
+            type: CHART
+            parents:
+            - ROOT_ID
+            - GRID_ID
+            - ROW-N-ASTGRSR7
+        theme_uuid: null
+        version: 1.0.0
+        tags: []
+      databases/Warehouse_import_example.yaml: |
+        database_name: Warehouse (import example)
+        sqlalchemy_uri: postgresql+psycopg2://examples:XXXXXXXXXX@postgres:5432/examples
+        cache_timeout: null
+        expose_in_sqllab: true
+        allow_run_async: false
+        allow_ctas: false
+        allow_cvas: false
+        allow_dml: false
+        allow_file_upload: false
+        extra:
+          metadata_params: {}
+          engine_params: {}
+          metadata_cache_timeout: {}
+          schemas_allowed_for_file_upload: []
+        impersonate_user: false
+        configuration_method: sqlalchemy_form
+        uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+        version: 1.0.0
+      datasets/Warehouse_import_example/sales_1.yaml: |
+        table_name: sales
+        main_dttm_col: day
+        currency_code_column: null
+        description: null
+        default_endpoint: null
+        offset: 0
+        cache_timeout: null
+        catalog: examples
+        schema: public
+        sql: null
+        params: null
+        template_params: null
+        filter_select_enabled: true
+        fetch_values_predicate: null
+        extra: null
+        normalize_columns: false
+        always_filter_main_dttm: false
+        folders: null
+        uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+        metrics:
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: null
+          d3format: null
+          currency: null
+          extra: null
+          warning_text: null
+        columns:
+        - column_name: amount
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: NUMERIC(10, 2)
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: day
+          verbose_name: null
+          is_dttm: true
+          is_active: true
+          type: DATE
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: id
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: INTEGER
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: region
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: TEXT
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        version: 1.0.0
+        database_uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+    databasePasswordsSecretRef:
+      name: sales-dashboardimport-db

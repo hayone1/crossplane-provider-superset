@@ -1,0 +1,36 @@
+apiVersion: tag.superset.m.crossplane.io/v1alpha1
+kind: Tag
+metadata:
+  annotations:
+    meta.upbound.io/example-id: tag/v1alpha1/tag
+  labels:
+    testing.upbound.io/example-name: finance
+  name: finance
+  namespace: default
+spec:
+  forProvider:
+    description: Owned by the finance team
+    name: finance
+
+---
+
+apiVersion: chart.superset.m.crossplane.io/v1alpha1
+kind: Chart
+metadata:
+  annotations:
+    meta.upbound.io/example-id: tag/v1alpha1/tag
+  labels:
+    testing.upbound.io/example-name: revenue
+  name: revenue
+  namespace: default
+spec:
+  forProvider:
+    datasourceIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: sales
+    name: Revenue
+    params: ${jsonencode({ viz_type = "table", all_columns = ["day", "amount"] })}
+    tagsRefs:
+    - name: finance
+    - name: example
+    vizType: table

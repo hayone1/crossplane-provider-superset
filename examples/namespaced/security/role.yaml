@@ -1,0 +1,11 @@
+# This example creates a role that users and groups can have. A RolePermissions gives the role
+# its permissions.
+# e2e-update: Role/analysts {"spec":{"forProvider":{"name":"Analysts (example, renamed)"}}}
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  namespace: default
+  name: analysts
+spec:
+  forProvider:
+    name: Analysts (example)

@@ -1,0 +1,52 @@
+# This example creates a group of users with a role (Superset 6). The members of the group get the
+# roles of the group.
+# e2e-update: Group/finance {"spec":{"forProvider":{"description":"The finance team (updated)"}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: default
+  name: bob-password
+type: Opaque
+stringData:
+  password: Change-me-5678
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  namespace: default
+  name: finance
+spec:
+  forProvider:
+    name: Finance (example)
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  namespace: default
+  name: bob
+spec:
+  forProvider:
+    username: bob.example
+    firstName: Bob
+    lastName: Example
+    email: bob@example.com
+    passwordSecretRef:
+      name: bob-password
+      key: password
+    rolesRefs:
+      - name: finance
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Group
+metadata:
+  namespace: default
+  name: finance
+spec:
+  forProvider:
+    name: finance-example
+    label: Finance
+    description: The finance team
+    rolesRefs:
+      - name: finance
+    usersRefs:
+      - name: bob

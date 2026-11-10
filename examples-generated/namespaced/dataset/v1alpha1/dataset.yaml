@@ -1,0 +1,41 @@
+apiVersion: dataset.superset.m.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  annotations:
+    meta.upbound.io/example-id: dataset/v1alpha1/dataset
+  labels:
+    testing.upbound.io/example-name: sales
+  name: sales
+  namespace: default
+spec:
+  forProvider:
+    cacheTimeout: 600
+    columns:
+    - columnName: id
+      groupby: false
+    - columnName: amount
+      verboseName: Amount
+    - columnName: sold_at
+      isDttm: true
+    - columnName: amount_cents
+      expression: amount * 100
+      type: NUMERIC
+    databaseNameSelector:
+      matchLabels:
+        testing.upbound.io/example-name: warehouse
+    description: One row per sale
+    extra: |-
+      ${jsonencode({
+          certification = { certified_by = "Data team", details = "Reviewed monthly" }
+        })}
+    mainDttmCol: sold_at
+    metrics:
+    - expression: COUNT(*)
+      metricName: count
+      verboseName: Sales
+    - d3format: ',.2f'
+      expression: SUM(amount)
+      metricName: revenue
+      verboseName: Revenue
+    schema: public
+    tableName: sales

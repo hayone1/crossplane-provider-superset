@@ -1,0 +1,15 @@
+apiVersion: dataset.superset.crossplane.io/v1alpha1
+kind: DatasetRefresh
+metadata:
+  annotations:
+    meta.upbound.io/example-id: dataset/v1alpha1/datasetrefresh
+  labels:
+    testing.upbound.io/example-name: sales
+  name: sales
+spec:
+  forProvider:
+    datasetIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: sales
+    triggers:
+      version: "2"

@@ -1,0 +1,24 @@
+apiVersion: chart.superset.crossplane.io/v1alpha1
+kind: Chart
+metadata:
+  annotations:
+    meta.upbound.io/example-id: chart/v1alpha1/chart
+  labels:
+    testing.upbound.io/example-name: daily_signups
+  name: daily-signups
+spec:
+  forProvider:
+    cacheTimeout: 300
+    datasourceIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: signups
+    description: Signups per day over the last month
+    name: Daily signups
+    params: |-
+      ${jsonencode({
+          viz_type   = "echarts_timeseries_line"
+          x_axis     = "day"
+          metrics    = ["count"]
+          time_range = "Last month"
+        })}
+    vizType: echarts_timeseries_line

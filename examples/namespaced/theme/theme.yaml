@@ -1,0 +1,13 @@
+# This example creates a theme of Superset 6. systemDefault and systemDark would make it the
+# default or the dark theme of the whole instance. This example leaves both off.
+# e2e-update: Theme/corporate {"spec":{"forProvider":{"name":"Corporate (example, renamed)"}}}
+apiVersion: theme.superset.m.crossplane.io/v1alpha1
+kind: Theme
+metadata:
+  namespace: default
+  name: corporate
+spec:
+  forProvider:
+    name: Corporate (example)
+    jsonData: |
+      {"token": {"colorPrimary": "#1f77b4", "fontFamily": "Inter, sans-serif"}}

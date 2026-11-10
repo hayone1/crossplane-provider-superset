@@ -1,0 +1,22 @@
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: example_user
+  name: example-user
+  namespace: default
+spec:
+  forProvider:
+    active: true
+    email: example.sample@example.com
+    firstName: Example
+    lastName: Sample
+    passwordSecretRef:
+      key: example-key
+      name: example-secret
+    rolesRefs:
+    - name: example
+    - name: example
+    username: example.user

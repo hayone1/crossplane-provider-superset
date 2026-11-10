@@ -1,0 +1,19 @@
+slice_name: Sales by region (import example)
+description: null
+certified_by: null
+certification_details: null
+viz_type: table
+params:
+  viz_type: table
+  query_mode: aggregate
+  groupby:
+  - region
+  metrics:
+  - count
+  row_limit: 100
+query_context: null
+cache_timeout: null
+uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b
+version: 1.0.0
+dataset_uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+tags: []

@@ -1,0 +1,101 @@
+# Handoff
+
+This file is the memory between work sessions. Read it at the start of a session, and update it
+before you stop (see the `session-handoff` skill). Never put secret values here.
+
+## Last updated
+
+2026-11-10 (first session): the provider is generated, configured, documented, reviewed in two
+subagent rounds, and passes the end-to-end test against Superset 6.1 in both API variants. Nine
+fixes to the Terraform provider are open upstream as pull requests #90 to #98. The code is pushed
+to GitHub; nothing is published as a package yet (`RELEASE_ENABLED` is not set).
+
+## State
+
+* **Generated:** Upjet v2.5.1 generates all 24 resources of the Terraform provider in both scopes.
+  `make generate` from the fork reproduces the committed files exactly. Crossplane runtime and
+  tool versions follow `../crossplane-provider-wso2is`.
+* **Terraform provider:** `github.com/platacard/terraform-provider-superset` v1.0.0 (2026-11-08,
+  the most complete Superset provider: 24 resources, plugin framework). `go.mod` replaces it with
+  the branch `crossplane-integration` of the fork `github.com/hayone1/terraform-provider-superset`
+  (pseudo-version of commit `e68d1dc`), which holds all nine fixes.
+* **Hand-written configuration:**
+  * `config/external_name.go`: numeric IDs (the `"0"` sentinel before a create, a number-aware
+    external name, `idAsString` conversion for `status.atProvider.id`, `stateWithout` empty-state
+    check), import kinds keyed by `content_hash`, parent IDs from the external name, sync
+    operations except imports, DatasetRefresh and DatabasePermissionsSync (`runsInBackground`).
+  * `config/resources.go`: groups and kinds, references (by-name references read
+    `status.atProvider`), import kinds take `files` only (no `source`), DashboardEmbedding
+    publishes `uuid` as a connection detail.
+  * `internal/clients/configcheck.go`: runs the framework's `ValidateResourceConfig` before
+    writes, fills empty required lists (`EmptiableCollections`), and caches the configured client
+    per configuration for 10 minutes with singleflight (`configurecache.go`).
+  * `internal/clients/superset.go`: credentials (`host`, `username`, `password`,
+    `auth_provider`, `csrf_enabled`), `spec.host`, namespaced ProviderConfig rules.
+* **Unit tests:** `go test ./config/... ./internal/clients/...` and `golangci-lint run ./...`
+  pass (2026-11-10, on the lab).
+* **End-to-end tests** (`test/e2e/run.sh`, final build, 2026-11-10): cluster scope 25/25 and
+  namespaced scope 26/26 manifests (every example plus `test/e2e/getting-started.yaml`) passed:
+  create, update-loop check, update verified in `status.atProvider`, import by external name,
+  delete. Logs: `/root/work/e2e-*.out` on the lab.
+* **In-cluster:** `make local-deploy` installed the package in kind with Crossplane 2.4.3
+  (Healthy, leader lease taken) and `make uptest` passed 10 manifests (apply, import, delete).
+* **Re-import:** deleting an imported dashboard in Superset made the DashboardImport import it
+  again within one poll, and deleting the managed resource then deleted it (checked by hand).
+* **Superset 5.0:** a Terraform apply and plan of 20 kinds (all but the Superset 6 ones) showed
+  no drift.
+
+## Upstream fixes
+
+Pull requests to platacard/terraform-provider-superset, from branches of the fork
+(local worktree `../tfp-superset-prs`):
+
+| PR | Branch | Fix | Needs |
+|----|--------|-----|-------|
+| #90 | `pr/public-provider-package` | Full module path and a public `provider` package | |
+| #91 | `pr/client-long-running` | 5-minute HTTP timeout; database list cache per client; no DEBUG prints | |
+| #92 | `pr/inline-bundles` | `files` for the import resources; secret keys may be a file name | |
+| #93 | `pr/read-missing-objects` | Role, user and role permissions that no longer exist are removed on Read | |
+| #94 | `pr/dataset-cache-timeout` | Unset `cache_timeout` stays null (creating a dataset failed on Superset 6) | |
+| #95 | `pr/action-triggers-in-place` | DatasetRefresh and DatabasePermissionsSync update in place on `triggers` | |
+| #96 | `pr/delete-missing-objects` | Deleting objects that are already gone succeeds | #93 |
+| #97 | `pr/retry-rate-limit` | Retry 429 Too Many Requests with backoff and jitter | #91 |
+| #98 | `pr/import-outdated-hash` | An import keeps an `"outdated"` hash when an object is gone | #92 |
+
+`../terraform-provider-superset` has the branch `crossplane-integration` (all fixes, on the module
+path of #90) and the remote `fork`. When a fix changes, update its `pr/*` branch and the
+integration branch, push both, and bump the pseudo-version in `go.mod`. When upstream releases
+all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefile.
+
+## Environment
+
+* **Hetzner lab server `superset-lab`** (cpx62, fsn1, about EUR 0.25 an hour): Terraform in
+  `hack/lab`, state and SSH key in `_debug/lab/` (git-ignored), `ssh -F _debug/lab/ssh_config lab`.
+  It runs two Superset 6.1 stacks (`superset-test`, port 8088, alias `superset` on the kind
+  network; `superset-uptest`, port 8091), kind clusters and the builds. The token is
+  `TF_VAR_hcloud_token` in `.env`. See "Open items" about destroying it.
+* The local machine (WSL) has about 5 GB of memory: build the generated code on the lab, or use
+  `GOFLAGS=-p=2`.
+* Worktrees of the Terraform provider: `../tfp-superset-prs` (PR branches),
+  `../tfp-superset-{ratelimit,triggers,imports,integration}` (working copies; can be removed with
+  `git worktree remove`).
+
+## Open items
+
+1. Watch the upstream pull requests. When they merge and a release has them, drop the `replace`.
+2. Repository settings like the Hostinger repository (branch ruleset, auto-merge, Dependabot
+   security updates) and `RELEASE_ENABLED`, `XPKG_MIRROR_*` secrets for publishing: ask the user.
+3. Destroy the lab when the user no longer needs it (see the command in `hack/lab/main.tf`'s
+   directory: `terraform -chdir=hack/lab destroy -var-file=../../_debug/lab/lab.tfvars
+   -state=../../_debug/lab/terraform.tfstate`).
+
+## Known problems
+
+* Superset refuses to delete objects that others use; the provider retries
+  (`docs/behaviour.md`).
+* A request that hangs for more than three minutes during a synchronous create leaves the managed
+  resource at "cannot determine creation result" (`docs/behaviour.md`, "Requests that take long").
+* A Secret that changed while the provider was stopped is not sent until it changes again (Upjet
+  rebuilds the prior state from current Secrets).
+* Fields that need a replacement in Terraform (for example the `databaseName` of a Dataset) are
+  reported as errors; Upjet does not replace objects.

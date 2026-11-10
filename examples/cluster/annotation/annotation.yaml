@@ -1,0 +1,22 @@
+# This example creates an annotation: an event or a period on the time axis of charts.
+# e2e-update: Annotation/v2-launch {"spec":{"forProvider":{"shortDescr":"v2.0.1","longDescr":"New checkout flow, fixed"}}}
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: AnnotationLayer
+metadata:
+  name: launches
+spec:
+  forProvider:
+    name: Launches (example)
+---
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: Annotation
+metadata:
+  name: v2-launch
+spec:
+  forProvider:
+    layerIdRef:
+      name: launches
+    shortDescr: v2.0.0
+    longDescr: New checkout flow
+    startDttm: "2026-01-15T09:00:00"
+    endDttm: "2026-01-15T09:00:00"

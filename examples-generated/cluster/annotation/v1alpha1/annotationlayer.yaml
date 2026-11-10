@@ -1,0 +1,12 @@
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: AnnotationLayer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: annotation/v1alpha1/annotationlayer
+  labels:
+    testing.upbound.io/example-name: releases
+  name: releases
+spec:
+  forProvider:
+    description: One annotation per release, shown on the KPI charts
+    name: Product releases

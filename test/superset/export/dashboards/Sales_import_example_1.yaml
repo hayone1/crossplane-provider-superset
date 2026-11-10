@@ -1,0 +1,49 @@
+dashboard_title: Sales (import example)
+description: null
+css: null
+slug: sales-import-example
+certified_by: null
+certification_details: null
+published: true
+uuid: d4e0800b-5c7b-46b5-b51b-9abb4dfbe426
+position:
+  DASHBOARD_VERSION_KEY: v2
+  ROOT_ID:
+    type: ROOT
+    id: ROOT_ID
+    children:
+    - GRID_ID
+  GRID_ID:
+    type: GRID
+    id: GRID_ID
+    parents:
+    - ROOT_ID
+    children:
+    - ROW-N-ASTGRSR7
+  ROW-N-ASTGRSR7:
+    children:
+    - CHART-L8CDLZD2
+    id: ROW-N-ASTGRSR7
+    meta:
+      background: BACKGROUND_TRANSPARENT
+    type: ROW
+    parents:
+    - ROOT_ID
+    - GRID_ID
+  CHART-L8CDLZD2:
+    children: []
+    id: CHART-L8CDLZD2
+    meta:
+      height: 50
+      sliceName: Sales by region (import example)
+      uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b
+      width: 4
+      chartId: 1
+    type: CHART
+    parents:
+    - ROOT_ID
+    - GRID_ID
+    - ROW-N-ASTGRSR7
+theme_uuid: null
+version: 1.0.0
+tags: []

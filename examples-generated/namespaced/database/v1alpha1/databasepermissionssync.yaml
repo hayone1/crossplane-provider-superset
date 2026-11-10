@@ -1,0 +1,16 @@
+apiVersion: database.superset.m.crossplane.io/v1alpha1
+kind: DatabasePermissionsSync
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1alpha1/databasepermissionssync
+  labels:
+    testing.upbound.io/example-name: warehouse
+  name: warehouse
+  namespace: default
+spec:
+  forProvider:
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: warehouse
+    triggers:
+      version: "2"

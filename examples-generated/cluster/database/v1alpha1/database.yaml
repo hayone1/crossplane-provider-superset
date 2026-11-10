@@ -1,0 +1,25 @@
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1alpha1/database
+  labels:
+    testing.upbound.io/example-name: warehouse
+  name: warehouse
+spec:
+  forProvider:
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+    allowRunAsync: true
+    connectionName: Warehouse
+    dbEngine: postgresql
+    dbHost: pg.db.ro.domain.com
+    dbName: warehouse
+    dbPassSecretRef:
+      key: example-key
+      name: example-secret
+      namespace: upbound-system
+    dbPort: 5432
+    dbUser: superset
+    exposeInSqllab: true

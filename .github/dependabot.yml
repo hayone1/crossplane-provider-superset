@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: fix(deps)
+    # The Terraform plugin libraries must stay compatible with both Upjet and
+    # terraform-provider-superset. They move when one of those two modules
+    # moves.
+    ignore:
+      - dependency-name: github.com/hashicorp/terraform-plugin-sdk/v2
+      - dependency-name: github.com/hashicorp/terraform-plugin-go
+      - dependency-name: github.com/hashicorp/terraform-plugin-framework
+    groups:
+      # Bumped together with TERRAFORM_PROVIDER_VERSION and `make generate`.
+      terraform-provider:
+        patterns: [github.com/platacard/terraform-provider-superset]
+      go:
+        patterns: ['*']
+        exclude-patterns: [github.com/platacard/terraform-provider-superset]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
+
+  # The Superset and PostgreSQL images of the test setup. The provider is tested with
+  # Superset 6.1, so only patch releases are proposed; a new minor version needs its own testing.
+  - package-ecosystem: docker-compose
+    directory: /test/superset
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: test
+    ignore:
+      - dependency-name: apache/superset
+        update-types: [version-update:semver-major, version-update:semver-minor]
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]

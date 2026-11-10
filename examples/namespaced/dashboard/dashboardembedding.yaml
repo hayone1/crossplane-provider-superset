@@ -1,0 +1,27 @@
+# This example makes a dashboard embeddable with the Superset embedded SDK. The SDK needs the
+# UUID of the embedding. status.atProvider.uuid shows the UUID, and the connection secret holds it
+# under the key "uuid". Guest tokens need the feature flag EMBEDDED_SUPERSET.
+# e2e-update: DashboardEmbedding/embedded {"spec":{"forProvider":{"allowedDomains":["https://app.example.com","https://portal.example.com"]}}}
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: Dashboard
+metadata:
+  namespace: default
+  name: embedded
+spec:
+  forProvider:
+    title: Embedded (example)
+    slug: embedded-example
+---
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: DashboardEmbedding
+metadata:
+  namespace: default
+  name: embedded
+spec:
+  forProvider:
+    dashboardIdRef:
+      name: embedded
+    allowedDomains:
+      - https://app.example.com
+  writeConnectionSecretToRef:
+    name: embedded-dashboard

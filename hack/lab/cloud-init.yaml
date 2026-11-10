@@ -1,0 +1,28 @@
+#cloud-config
+# Tools for building and testing the provider. /var/lib/lab-ready appears when all are installed.
+package_update: true
+packages:
+  - build-essential
+  - ca-certificates
+  - curl
+  - git
+  - jq
+  - make
+  - python3
+  - python3-yaml
+  - rsync
+  - unzip
+runcmd:
+  - set -eux
+  - curl -fsSL https://get.docker.com | sh
+  - curl -fsSL https://go.dev/dl/go1.26.10.linux-amd64.tar.gz | tar -C /usr/local -xz
+  - echo 'export PATH=/usr/local/go/bin:/root/go/bin:$PATH' > /etc/profile.d/go.sh
+  - export PATH=/usr/local/go/bin:/root/go/bin:$PATH HOME=/root GOPATH=/root/go
+  - go install sigs.k8s.io/kind@latest
+  - go install golang.org/x/tools/cmd/goimports@latest
+  - curl -fsSLo /usr/local/bin/kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && chmod +x /usr/local/bin/kubectl
+  - curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  - curl -fsSL https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip -o /tmp/tf.zip && unzip -o /tmp/tf.zip -d /usr/local/bin terraform
+  - sysctl -w fs.inotify.max_user_watches=524288 fs.inotify.max_user_instances=512
+  - printf 'fs.inotify.max_user_watches=524288\nfs.inotify.max_user_instances=512\n' > /etc/sysctl.d/90-kind.conf
+  - touch /var/lib/lab-ready

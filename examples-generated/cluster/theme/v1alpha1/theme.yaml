@@ -1,0 +1,36 @@
+apiVersion: theme.superset.crossplane.io/v1alpha1
+kind: Theme
+metadata:
+  annotations:
+    meta.upbound.io/example-id: theme/v1alpha1/theme
+  labels:
+    testing.upbound.io/example-name: corporate
+  name: corporate
+spec:
+  forProvider:
+    jsonData: |-
+      ${jsonencode({
+          token = {
+            colorPrimary = "#1f77b4"
+            fontFamily   = "Inter, sans-serif"
+          }
+        })}
+    name: Corporate
+    systemDefault: true
+
+---
+
+apiVersion: dashboard.superset.crossplane.io/v1alpha1
+kind: Dashboard
+metadata:
+  annotations:
+    meta.upbound.io/example-id: theme/v1alpha1/theme
+  labels:
+    testing.upbound.io/example-name: board
+  name: board
+spec:
+  forProvider:
+    themeIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: executive
+    title: Board

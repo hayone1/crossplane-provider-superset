@@ -1,0 +1,35 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-superset
+  annotations:
+    meta.crossplane.io/maintainer: "hayone1 <boluwatife.morawo@stu.cu.edu.ng>"
+    meta.crossplane.io/source: "github.com/hayone1/crossplane-provider-superset"
+    meta.crossplane.io/license: "Apache-2.0"
+    friendly-name.meta.crossplane.io: Community provider for Apache Superset
+    meta.crossplane.io/iconURI: https://raw.githubusercontent.com/hayone1/crossplane-provider-superset/main/extensions/icons/icon.svg
+    meta.crossplane.io/description: |
+      This provider manages Apache Superset with Crossplane. It covers database
+      connections, datasets, charts, dashboards, users, roles, permissions, row level
+      security, reports, themes and imports of exported dashboards. Upjet generated it
+      from the Superset Terraform provider. This provider is an independent community
+      project, not affiliated with, sponsored or endorsed by the Apache Software Foundation.
+    meta.crossplane.io/readme: |
+      This Crossplane provider manages Apache Superset. It is tested with Superset 6.1.
+      Upjet generated it from the Terraform provider at
+      https://github.com/platacard/terraform-provider-superset. The provider runs the
+      Terraform provider in its own process, so the package needs no Terraform binary.
+
+      It offers 24 managed resources in two API variants: cluster-scoped
+      (*.superset.crossplane.io) and namespaced (*.superset.m.crossplane.io).
+
+      Documentation and examples: https://github.com/hayone1/crossplane-provider-superset
+
+      This provider is an independent community project. It is not affiliated with,
+      sponsored or endorsed by the Apache Software Foundation. Apache, Apache Superset
+      and Superset are trademarks or registered trademarks of the Apache Software
+      Foundation in the United States and/or other countries. This text uses them only to
+      name the product that the provider works with.
+spec:
+  capabilities:
+    - SafeStart

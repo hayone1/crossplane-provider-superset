@@ -1,0 +1,42 @@
+# This example creates a meta database: one connection that queries across other connections
+# in SQL Lab. Superset needs the feature flag ENABLE_SUPERSET_META_DB.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: meta-source-db
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  password: examples
+---
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: meta-source
+spec:
+  forProvider:
+    connectionName: Warehouse (meta database example)
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef:
+      name: meta-source-db
+      namespace: crossplane-system
+      key: password
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+---
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: MetaDatabase
+metadata:
+  name: cross-database
+spec:
+  forProvider:
+    databaseName: Cross-database queries (example)
+    allowedDatabasesRefs:
+      - name: meta-source

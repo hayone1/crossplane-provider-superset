@@ -1,0 +1,147 @@
+# This example imports a chart with its dataset and database. Deleting the managed
+# resource deletes the chart. The dataset and the database stay.
+# e2e-update: ChartImport/sales-chartimport {"spec":{"forProvider":{"files":{"charts/Sales_by_region_import_example_1.yaml":"slice_name: Sales by region (import example)\ndescription: Changed by the end-to-end test\ncertified_by: null\ncertification_details: null\nviz_type: table\nparams:\n  viz_type: table\n  query_mode: aggregate\n  groupby:\n  - region\n  metrics:\n  - count\n  row_limit: 100\nquery_context: null\ncache_timeout: null\nuuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b\nversion: 1.0.0\ndataset_uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac\ntags: []\n"}}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sales-chartimport-db
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  # The key is the file name of the database in the bundle (databases/<file>).
+  Warehouse_import_example.yaml: examples
+---
+apiVersion: assets.superset.crossplane.io/v1alpha1
+kind: ChartImport
+metadata:
+  name: sales-chartimport
+spec:
+  forProvider:
+    files:
+      charts/Sales_by_region_import_example_1.yaml: |
+        slice_name: Sales by region (import example)
+        description: null
+        certified_by: null
+        certification_details: null
+        viz_type: table
+        params:
+          viz_type: table
+          query_mode: aggregate
+          groupby:
+          - region
+          metrics:
+          - count
+          row_limit: 100
+        query_context: null
+        cache_timeout: null
+        uuid: c03566b2-aaf3-4bba-9dba-3a83e820da6b
+        version: 1.0.0
+        dataset_uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+        tags: []
+      databases/Warehouse_import_example.yaml: |
+        database_name: Warehouse (import example)
+        sqlalchemy_uri: postgresql+psycopg2://examples:XXXXXXXXXX@postgres:5432/examples
+        cache_timeout: null
+        expose_in_sqllab: true
+        allow_run_async: false
+        allow_ctas: false
+        allow_cvas: false
+        allow_dml: false
+        allow_file_upload: false
+        extra:
+          metadata_params: {}
+          engine_params: {}
+          metadata_cache_timeout: {}
+          schemas_allowed_for_file_upload: []
+        impersonate_user: false
+        configuration_method: sqlalchemy_form
+        uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+        version: 1.0.0
+      datasets/Warehouse_import_example/sales_1.yaml: |
+        table_name: sales
+        main_dttm_col: day
+        currency_code_column: null
+        description: null
+        default_endpoint: null
+        offset: 0
+        cache_timeout: null
+        catalog: examples
+        schema: public
+        sql: null
+        params: null
+        template_params: null
+        filter_select_enabled: true
+        fetch_values_predicate: null
+        extra: null
+        normalize_columns: false
+        always_filter_main_dttm: false
+        folders: null
+        uuid: d75b1932-3700-4e62-83af-0cee4b8b7eac
+        metrics:
+        - metric_name: count
+          verbose_name: COUNT(*)
+          metric_type: count
+          expression: COUNT(*)
+          description: null
+          d3format: null
+          currency: null
+          extra: null
+          warning_text: null
+        columns:
+        - column_name: amount
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: NUMERIC(10, 2)
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: day
+          verbose_name: null
+          is_dttm: true
+          is_active: true
+          type: DATE
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: id
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: INTEGER
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        - column_name: region
+          verbose_name: null
+          is_dttm: false
+          is_active: true
+          type: TEXT
+          advanced_data_type: null
+          groupby: true
+          filterable: true
+          expression: null
+          description: null
+          python_date_format: null
+          datetime_format: null
+          extra: null
+        version: 1.0.0
+        database_uuid: 5b20f1cd-6e8b-46dc-9258-98d681f75a2c
+    databasePasswordsSecretRef:
+      name: sales-chartimport-db
+      namespace: crossplane-system

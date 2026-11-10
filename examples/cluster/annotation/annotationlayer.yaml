@@ -1,0 +1,11 @@
+# This example creates an annotation layer, a set of events that charts can show on their time
+# axis.
+# e2e-update: AnnotationLayer/releases {"spec":{"forProvider":{"description":"One annotation per release (updated)"}}}
+apiVersion: annotation.superset.crossplane.io/v1alpha1
+kind: AnnotationLayer
+metadata:
+  name: releases
+spec:
+  forProvider:
+    name: Product releases (example)
+    description: One annotation per release

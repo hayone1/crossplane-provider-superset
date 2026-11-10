@@ -1,0 +1,13 @@
+# The ClusterProviderConfig that namespaced managed resources use when they name no other.
+# It reads the credentials from the Secret in secret.yaml.tmpl.
+apiVersion: superset.m.crossplane.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: crossplane-system
+      name: superset-creds
+      key: credentials

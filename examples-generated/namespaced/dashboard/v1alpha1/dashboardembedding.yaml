@@ -1,0 +1,17 @@
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: DashboardEmbedding
+metadata:
+  annotations:
+    meta.upbound.io/example-id: dashboard/v1alpha1/dashboardembedding
+  labels:
+    testing.upbound.io/example-name: signups
+  name: signups
+  namespace: default
+spec:
+  forProvider:
+    allowedDomains:
+    - https://app.example.com
+    - https://portal.example.com
+    dashboardIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: signups

@@ -1,0 +1,15 @@
+# This example creates a CSS template, which dashboards can apply in their editor.
+# e2e-update: CSSTemplate/dark-header {"spec":{"forProvider":{"templateName":"Dark header (example, renamed)"}}}
+apiVersion: dashboard.superset.m.crossplane.io/v1alpha1
+kind: CSSTemplate
+metadata:
+  namespace: default
+  name: dark-header
+spec:
+  forProvider:
+    templateName: Dark header (example)
+    css: |
+      .dashboard-header {
+        background-color: #1f1f1f;
+        color: #ffffff;
+      }

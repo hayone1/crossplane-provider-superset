@@ -1,0 +1,27 @@
+# This example gives a role its permissions. The managed resource owns all permissions of the
+# role, so it removes the permissions that it does not list. Each permission is a permission name
+# and a view menu, as in Settings > List Roles in Superset.
+# e2e-update: RolePermissions/viewers {"spec":{"forProvider":{"resourcePermissions":[{"permission":"can_read","viewMenu":"Dashboard"},{"permission":"can_read","viewMenu":"Chart"},{"permission":"menu_access","viewMenu":"Dashboards"}]}}}
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  namespace: default
+  name: viewers
+spec:
+  forProvider:
+    name: Viewers (example)
+---
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: RolePermissions
+metadata:
+  namespace: default
+  name: viewers
+spec:
+  forProvider:
+    roleNameRef:
+      name: viewers
+    resourcePermissions:
+      - permission: can_read
+        viewMenu: Dashboard
+      - permission: can_read
+        viewMenu: Chart

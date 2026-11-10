@@ -1,0 +1,23 @@
+apiVersion: report.superset.crossplane.io/v1alpha1
+kind: Report
+metadata:
+  annotations:
+    meta.upbound.io/example-id: report/v1alpha1/report
+  labels:
+    testing.upbound.io/example-name: weekly_sales
+  name: weekly-sales
+spec:
+  forProvider:
+    crontab: 0 9 * * 1
+    dashboardIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: sales
+    description: Sales of the past week
+    name: Weekly sales
+    recipients:
+    - target: sales@example.com, management@example.com
+      type: Email
+    - target: '#sales'
+      type: Slack
+    timezone: Europe/Berlin
+    type: Report

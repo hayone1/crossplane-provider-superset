@@ -1,0 +1,21 @@
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: MetaDatabase
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1alpha1/metadatabase
+  labels:
+    testing.upbound.io/example-name: example
+  name: example
+spec:
+  forProvider:
+    allowCtas: false
+    allowCvas: false
+    allowDml: false
+    allowRunAsync: true
+    allowedDatabasesRefs:
+    - name: example
+    - name: example
+    databaseName: SuperSetDBConnection
+    exposeInSqllab: true
+    isManagedExternally: false
+    sqlalchemyUri: superset://

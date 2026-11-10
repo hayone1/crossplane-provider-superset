@@ -1,0 +1,36 @@
+# This example creates a Superset user with a password from a Secret and a role.
+# e2e-update: User/alice {"spec":{"forProvider":{"lastName":"Example (updated)","active":false}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alice-password
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  password: Change-me-1234
+---
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: Role
+metadata:
+  name: alice-role
+spec:
+  forProvider:
+    name: User example role
+---
+apiVersion: security.superset.crossplane.io/v1alpha1
+kind: User
+metadata:
+  name: alice
+spec:
+  forProvider:
+    username: alice.example
+    firstName: Alice
+    lastName: Example
+    email: alice@example.com
+    active: true
+    passwordSecretRef:
+      name: alice-password
+      namespace: crossplane-system
+      key: password
+    rolesRefs:
+      - name: alice-role

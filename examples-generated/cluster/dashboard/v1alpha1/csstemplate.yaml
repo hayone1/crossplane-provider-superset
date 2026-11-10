@@ -1,0 +1,16 @@
+apiVersion: dashboard.superset.crossplane.io/v1alpha1
+kind: CSSTemplate
+metadata:
+  annotations:
+    meta.upbound.io/example-id: dashboard/v1alpha1/csstemplate
+  labels:
+    testing.upbound.io/example-name: dark_header
+  name: dark-header
+spec:
+  forProvider:
+    css: |
+      .dashboard-header {
+        background-color: #1f1f1f;
+        color: #ffffff;
+      }
+    templateName: Dark header

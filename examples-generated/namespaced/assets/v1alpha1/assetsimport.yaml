@@ -1,0 +1,15 @@
+apiVersion: assets.superset.m.crossplane.io/v1alpha1
+kind: AssetsImport
+metadata:
+  annotations:
+    meta.upbound.io/example-id: assets/v1alpha1/assetsimport
+  labels:
+    testing.upbound.io/example-name: analytics
+  name: analytics
+  namespace: default
+spec:
+  forProvider:
+    databasePasswordsSecretRef:
+      key: example-key
+      name: example-secret
+    source: ${path.module}/exports/analytics
