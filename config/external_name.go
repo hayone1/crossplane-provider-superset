@@ -184,13 +184,13 @@ func ExternalNameConfigurations() config.ResourceOption {
 	}
 }
 
-// topLevelArguments returns the names of all top-level arguments of a resource. The
-// provider turns late initialization off for all of them. The Terraform provider treats an
-// optional argument that is not set as "leave it to Superset", for example the columns and
-// metrics of a dataset or the owners of a chart. Copying the server's values into
-// spec.forProvider would change that meaning: the managed resource would then own every
-// column, and a column added in Superset would be removed again. The current values are in
-// status.atProvider.
+// topLevelArguments returns the names of all top-level arguments of a resource. The provider
+// turns late initialization off for all of them. For an optional argument that Superset fills in
+// itself (optional and computed in the Terraform schema), leaving it out means "leave it to
+// Superset", for example the columns and metrics of a dataset or the owners of a chart. Copying
+// the values of Superset into spec.forProvider would change that meaning: the managed resource
+// would then own every column, and a column added in Superset would be removed again. The current
+// values are in status.atProvider, and docs/behaviour.md tells users which fields Superset keeps.
 func topLevelArguments(r *config.Resource) []string {
 	names := make([]string, 0, len(r.TerraformResource.Schema))
 	for name, s := range r.TerraformResource.Schema {

@@ -234,6 +234,7 @@ check_updates() {
             elif ($a | type) == "array"
             then ($b | type) == "array" and ($a | length) == ($b | length)
               and ([$a[] as $x | any($b[]; sub($x; .))] | all)
+              and ([$b[] as $y | any($a[]; sub(.; $y))] | all)
             else $a == $b end;
           . as $mr | ($patch.spec.forProvider // {}) | to_entries
           | map(select((.key | test("(Ref|Refs|Selector|SecretRef)$") | not)))
@@ -291,6 +292,7 @@ import_all() {
 # ends only the test of this manifest.
 test_manifest() {
   local m=$1
+  [[ -n "$(managed_in "$m")" ]] || fail "$m holds no managed resource of this provider"
   kubectl apply -f "$m" >/dev/null || fail "kubectl apply -f $m"
   wait_all "$m"
   check_idle "$m"

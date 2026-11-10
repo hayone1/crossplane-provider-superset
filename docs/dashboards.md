@@ -167,8 +167,10 @@ kind. A script builds them from the export in [test/superset/export](../test/sup
   provider imports the bundle again. Superset overwrites the objects with the same UUID, so their
   IDs stay the same.
 * If someone deletes an imported object in Superset, the provider imports the bundle again at its
-  next check. Until then, the managed resource keeps the IDs of the other objects, so deleting it
-  still deletes them.
+  next check. Until then, the external name is `outdated`, and the managed resource keeps the IDs
+  of the other objects, so deleting it still deletes them.
+* If the files cannot be imported, for example because a file is not valid YAML, the managed
+  resource shows the error and stays as it is. You can still delete it.
 * Changes that people make in the Superset editor stay until the bundle is imported again. To keep
   them, export the dashboard again and update the files.
 

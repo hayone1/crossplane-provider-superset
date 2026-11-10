@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -161,12 +162,22 @@ func applyHost(cfg map[string]any, specHost string) error {
 	case host == "":
 		return errors.New("the Superset URL is missing: set spec.host or the credentials key host")
 	case !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://"):
-		return errors.Errorf("the Superset URL %q must start with http:// or https://", host)
+		return errors.Errorf("the Superset URL %q must start with http:// or https://", redactURL(host))
 	case strings.ContainsAny(host, "?#"):
-		return errors.Errorf("the Superset URL %q must not have a query or a fragment", host)
+		return errors.Errorf("the Superset URL %q must not have a query or a fragment", redactURL(host))
 	}
 	cfg[keyHost] = host
 	return nil
+}
+
+// redactURL hides a password in a URL, so that error messages, which appear in the conditions
+// and events of managed resources, never show it. A text that is not a URL is hidden entirely.
+func redactURL(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return "(not a URL)"
+	}
+	return u.Redacted()
 }
 
 // parseCredentials reads the credentials JSON object and rejects unknown keys, so that a

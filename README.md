@@ -210,7 +210,7 @@ kind in both API variants.
 | Import kinds | `source` (a directory or zip file) or `files` | `files` only. The provider cannot read files of your machine, and it does not read files of its own pod. |
 | Passwords of an import | Keyed by the path of the database file | Keyed by the file name, because Secret keys cannot contain `/` |
 | Existing objects | `terraform import` | The `crossplane.io/external-name` annotation, set to the numeric ID |
-| Settings left out | Kept as Superset has them | The same. Late initialization is off, so `spec.forProvider` keeps only what you set, and `status.atProvider` shows the rest. |
+| Settings left out | Empty in Superset, or the default, except a few fields that Superset fills | The same ([Behaviour](docs/behaviour.md#settings-that-you-leave-out) lists them). Late initialization is off, so `spec.forProvider` holds only what you set, and `status.atProvider` shows the rest. |
 | Validation | When Terraform plans | Before each create and update, with the same checks |
 | Data sources | 14 | None. Crossplane manages objects. Use `status.atProvider` of a managed resource, or the Superset API. |
 

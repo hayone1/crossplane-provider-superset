@@ -7,8 +7,10 @@ name: Release
 # cosign), gets SLSA build provenance and an SBOM, and the GitHub release
 # (which creates the tag) comes last, so a failed run can simply be re-run.
 on:
+  # The release runs after CI and after the end-to-end test, and continues only when both passed
+  # for the same commit (see the "Gate" step).
   workflow_run:
-    workflows: [CI]
+    workflows: [CI, "End to End (Superset in Docker)"]
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -41,6 +43,7 @@ jobs:
     # to "true" (Settings > Secrets and variables > Actions > Variables).
     if: vars.RELEASE_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'))
     permissions:
+      actions: read       # the results of CI and the end-to-end test
       contents: write     # GitHub release and tag
       packages: write     # GHCR
       id-token: write     # keyless signing and attestations
@@ -56,8 +59,30 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Gate
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          # A manual run releases what it is told. After a workflow, both CI and the end-to-end
+          # test must have passed for this commit; the one that finishes last releases.
+          if [[ $EVENT == workflow_dispatch ]]; then echo "ready=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          for wf in ci.yml e2e-docker.yml; do
+            conclusion=$(gh api "repos/$REPO/actions/workflows/$wf/runs?head_sha=$SHA&event=push&per_page=1" \
+              --jq '.workflow_runs[0].conclusion // ""')
+            if [[ $conclusion != success ]]; then
+              echo "$wf: ${conclusion:-not finished}, so nothing is released by this run"
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
       - name: Version
         id: version
+        if: steps.gate.outputs.ready == 'true'
         env:
           INPUT_VERSION: ${{ inputs.version }}
         run: |

@@ -89,6 +89,8 @@ func TestConfiguration(t *testing.T) {
 // Error messages about the credentials must never contain the credentials.
 func TestConfigurationErrorsHideSecrets(t *testing.T) {
 	for _, creds := range []string{
+		`{"host": "ftp://admin:TOPSECRET@s.example.com", "username": "admin", "password": "x"}`,
+		`{"host": "https://admin:TOPSECRET@s.example.com?a=b", "username": "admin", "password": "x"}`,
 		`{"host": "https://s.example.com", "username": "admin", "password": "TOPSECRET", "user": "y"}`,
 		`{"username": "admin", "password": "TOPSECRET`,
 		`{"host": "https://s.example.com", "password": "TOPSECRET"}`,

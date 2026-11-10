@@ -150,13 +150,14 @@ Edit `examples/cluster` (or `test/superset/export`), run the scripts, and test b
   both API variants.
 * `security.yml` runs govulncheck, CodeQL, gitleaks and the dependency review. `scorecard.yml`
   runs the OpenSSF Scorecard.
-* `release.yml` publishes a release after CI passes on `main`. The version follows from the
-  Conventional Commit subjects since the last tag (`hack/next-version.sh`).
+* `release.yml` publishes a release after CI and the end-to-end test pass for a commit on `main`.
+  The version follows from the Conventional Commit subjects since the last tag
+  (`hack/next-version.sh`).
 
 ## Release
 
-Releases are automatic once the repository variable `RELEASE_ENABLED` is `true`. After CI passes on
-`main`, the workflow creates a new version unless every commit since the last tag is of type
+Releases are automatic once the repository variable `RELEASE_ENABLED` is `true`. After CI and the
+end-to-end test pass on `main`, the workflow creates a new version unless every commit since the last tag is of type
 `docs`, `ci`, `chore`, `test` or `style`. A `feat` raises the minor version, a breaking change
 (`type!:`) raises the major version (the minor version while the major version is 0), and anything
 else raises the patch version. The workflow scans the image, pushes the package to

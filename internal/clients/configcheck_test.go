@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	fwprovider "github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -230,5 +231,36 @@ func TestEmptiableCollectionsMatchTheSchema(t *testing.T) {
 	}
 	if !cmp.Equal(want, EmptiableCollections) {
 		t.Errorf("EmptiableCollections = %v, want %v", EmptiableCollections, want)
+	}
+}
+
+// An import whose files cannot be read must still plan without errors, so that Crossplane can
+// observe and delete it. The plan carries a known content hash, so that the update runs and
+// reports the error.
+func TestConfigCheck_importPlanDefersBundleErrors(t *testing.T) {
+	r, s := wrappedResource(t, "superset_dashboard_import")
+	files := tftypes.NewValue(tftypes.Map{ElementType: tftypes.String}, map[string]tftypes.Value{
+		// An object without a uuid cannot be imported.
+		"dashboards/a.yaml": tftypes.NewValue(tftypes.String, "dashboard_title: A\n"),
+	})
+	cfg := config(t, s, map[string]tftypes.Value{"files": files})
+	state := config(t, s, map[string]tftypes.Value{"files": files, "content_hash": tftypes.NewValue(tftypes.String, "abc")})
+	req := resource.ModifyPlanRequest{
+		Config: cfg,
+		Plan:   tfsdk.Plan{Schema: s.Schema, Raw: state.Raw},
+		State:  tfsdk.State{Schema: s.Schema, Raw: state.Raw},
+	}
+	resp := resource.ModifyPlanResponse{Plan: req.Plan}
+	r.(resource.ResourceWithModifyPlan).ModifyPlan(context.Background(), req, &resp)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("the plan failed: %s", diagnosticsString(resp.Diagnostics))
+	}
+	if resp.Diagnostics.WarningsCount() == 0 || !strings.Contains(diagnosticsString(resp.Diagnostics), "uuid") {
+		t.Errorf("the error about the files was lost: %v", resp.Diagnostics)
+	}
+	var hash string
+	resp.Diagnostics.Append(resp.Plan.GetAttribute(context.Background(), path.Root("content_hash"), &hash)...)
+	if hash != invalidBundleHash {
+		t.Errorf("planned content_hash %q, want %q", hash, invalidBundleHash)
 	}
 }
