@@ -95,12 +95,14 @@ observe the object. Then take it over:
 2. Wait until the managed resource is `READY`. Then look at `status.atProvider`, which holds the
    current values of the object.
 
-3. Copy the values that you want to manage into `spec.forProvider`, and remove
-   `managementPolicies`. The provider then changes the object to match `spec.forProvider`. Fields
-   that you leave out keep their values in Superset.
+3. Copy every value of `status.atProvider` that the object should keep into `spec.forProvider`,
+   and remove `managementPolicies`. The provider then changes the object to match
+   `spec.forProvider`. Most fields that you leave out become empty in Superset (see the next
+   section), so copy all of them except `id` and the other values that Superset computes.
 
 Compare the values carefully before you remove `managementPolicies`. For example, the `params` of
-a Chart replace the whole configuration of the chart.
+a Chart replace the whole configuration of the chart, and a RowLevelSecurity without `roles`
+applies to no role.
 
 Observing an object needs only the external name, with these exceptions:
 
@@ -110,14 +112,30 @@ Observing an object needs only the external name, with these exceptions:
 
 ## Settings that you leave out
 
-The provider changes only what `spec.forProvider` sets. A field that you leave out keeps the value
-that Superset has, and people can change the field in Superset. For example, a Dataset without
-`columns` keeps the columns that Superset detects. A Dashboard without `positionJson` keeps the
-layout that people build in the editor.
+The provider makes the object match `spec.forProvider`, as Terraform makes an object match its
+configuration. A field that you leave out does one of three things:
 
-The provider does not copy the values of Superset into `spec.forProvider`. Crossplane calls this
-late initialization, and the provider turns it off. Look at `status.atProvider` for the values
-that Superset has.
+1. **Superset keeps its value.** This is true only for fields that Superset fills in itself. People
+   can then change these fields in Superset, and the provider leaves the change alone:
+
+   | Kind | Fields |
+   |------|--------|
+   | Chart | `owners`, `queryContext`, `tags` |
+   | Dashboard | `jsonMetadata`, `owners`, `positionJson`, `tags` |
+   | Database | `cacheTimeout`, `extra` |
+   | Dataset | `columns`, `mainDttmCol`, `metrics`, `owners` |
+   | Report | `gracePeriod`, `logRetention`, `owners`, `reportFormat`, `timezone`, `workingTimeout` |
+
+2. **The field gets its default.** The description of such a field in the CRD names the default,
+   for example `published` of a Dashboard or `active` of a User. Run
+   `kubectl explain <kind>.<group>.superset.crossplane.io.spec.forProvider.<field>` to read it.
+3. **The field becomes empty in Superset.** This is true for every other field. For example, a
+   RowLevelSecurity without `roles` applies to no role, and a Group without `users` has no members.
+   The provider removes members that people add in Superset.
+
+So describe every value that matters to you in `spec.forProvider`. The provider does not copy the
+values of Superset into `spec.forProvider` (Crossplane calls this late initialization, and the
+provider turns it off). Look at `status.atProvider` for the values that Superset has.
 
 Some fields own a whole list once you set them:
 
@@ -127,8 +145,9 @@ Some fields own a whole list once you set them:
 * The `resourcePermissions` of a RolePermissions. The role has exactly these permissions, and the
   provider removes any other permission of the role.
 * The `roles` of a User. A User needs `roles` or `rolesRefs`.
-* The `roles` and `users` of a Group, `owners`, and `tags`. A list that you set replaces the list
-  in Superset. Without the field, Superset keeps its own list.
+
+`spec.initProvider` does not help here. For these kinds, the provider applies `spec.initProvider`
+at every check, not only when it creates the object, so it behaves like `spec.forProvider`.
 
 ## Changes outside Crossplane
 

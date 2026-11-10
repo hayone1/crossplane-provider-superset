@@ -2,9 +2,11 @@ package clients
 
 import (
 	"context"
+	"strings"
 	"sync"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	fwprovider "github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -231,9 +233,37 @@ func (g *configCheck) Configure(ctx context.Context, req resource.ConfigureReque
 }
 
 func (g *configCheck) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
-	if r, ok := g.inner.(resource.ResourceWithModifyPlan); ok {
-		r.ModifyPlan(ctx, req, resp)
+	r, ok := g.inner.(resource.ResourceWithModifyPlan)
+	if !ok {
+		return
 	}
+	r.ModifyPlan(ctx, req, resp)
+	if strings.HasSuffix(g.typeName, "_import") && resp.Diagnostics.HasError() && !req.Plan.Raw.IsNull() {
+		g.deferBundleErrors(ctx, resp)
+	}
+}
+
+// invalidBundleHash is the content hash that the plan of an import gets when its files cannot be
+// read. It differs from every real hash, so the plan shows a change and the provider runs the
+// update, which reports the error.
+const invalidBundleHash = "invalid"
+
+// deferBundleErrors turns the errors that the plan of an import reports about its files into
+// warnings. Upjet plans every time it observes a managed resource, and an observation that fails
+// stops Crossplane from deleting the managed resource. So an import whose files someone broke
+// could not be deleted, and its imported objects would stay in Superset. With the errors deferred,
+// the observation works, and the update reports the errors instead.
+func (g *configCheck) deferBundleErrors(ctx context.Context, resp *resource.ModifyPlanResponse) {
+	var deferred diag.Diagnostics
+	for _, d := range resp.Diagnostics {
+		if d.Severity() == diag.SeverityError {
+			deferred.AddWarning(d.Summary(), d.Detail())
+			continue
+		}
+		deferred.Append(d)
+	}
+	resp.Diagnostics = deferred
+	resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root("content_hash"), invalidBundleHash)...)
 }
 
 func (g *configCheck) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {

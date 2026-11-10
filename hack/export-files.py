@@ -46,7 +46,7 @@ def read_export(source: pathlib.Path) -> dict:
     entries = {}
     if source.is_dir():
         for path in sorted(source.rglob("*.yaml")):
-            entries[path.relative_to(source).as_posix()] = path.read_text()
+            entries[path.relative_to(source).as_posix()] = path.read_text(encoding="utf-8")
     else:
         with zipfile.ZipFile(source) as archive:
             for name in sorted(archive.namelist()):

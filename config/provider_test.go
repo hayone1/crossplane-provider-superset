@@ -205,6 +205,9 @@ func TestStateWithout(t *testing.T) {
 		{"no hash", attrContentHash, state(nil, nil), true},
 		{"empty hash", attrContentHash, state(nil, ""), true},
 		{"hash", attrContentHash, state(nil, "abc"), false},
+		// An import whose object was deleted in Superset still exists, so that its delete
+		// removes the other objects; the Terraform provider marks its hash as outdated.
+		{"outdated hash", attrContentHash, state(nil, "outdated"), false},
 		{"missing attribute", "other", state(12, "abc"), true},
 	}
 	for _, tc := range cases {
