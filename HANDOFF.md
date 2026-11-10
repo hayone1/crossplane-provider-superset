@@ -6,11 +6,11 @@ before you stop (see the `session-handoff` skill). Never put secret values here.
 ## Last updated
 
 2026-11-10 (first session): the provider is generated, configured, documented, reviewed in three
-subagent rounds, and passes the end-to-end test against Superset 6.1 in both API variants. Nine
-fixes to the Terraform provider are open upstream as pull requests #90 to #98. The repository
-github.com/hayone1/crossplane-provider-superset has the initial commit on `main` and the fixes of
-the third review in pull request #3. Nothing is published as a package yet (`RELEASE_ENABLED` is
-not set).
+subagent rounds, and passes the end-to-end test against Superset 6.1 in both API variants, on the
+lab and in GitHub Actions. Nine fixes to the Terraform provider are open upstream as pull requests
+#90 to #98. `main` of github.com/hayone1/crossplane-provider-superset has everything (pull
+requests #1 to #3 merged). The Hetzner lab is destroyed. Nothing is published as a package yet
+(`RELEASE_ENABLED` is not set).
 
 ## State
 
@@ -73,27 +73,25 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
 
 ## Environment
 
-* **Hetzner lab server `superset-lab`** (cpx62, fsn1, about EUR 0.25 an hour): Terraform in
-  `hack/lab`, state and SSH key in `_debug/lab/` (git-ignored), `ssh -F _debug/lab/ssh_config lab`.
-  It runs two Superset 6.1 stacks (`superset-test`, port 8088, alias `superset` on the kind
-  network; `superset-uptest`, port 8091), kind clusters and the builds. The token is
-  `TF_VAR_hcloud_token` in `.env`. See "Open items" about destroying it.
-* The local machine (WSL) has about 5 GB of memory: build the generated code on the lab, or use
-  `GOFLAGS=-p=2`.
+* **Hetzner lab: destroyed** on 2026-11-10 (no servers, SSH keys or firewalls left in the project).
+  `hack/lab/README.md` explains how to create it again. The token is `TF_VAR_hcloud_token` in
+  `.env`. The last logs of the lab are in `_debug/lab-logs/` (git-ignored).
+* The local machine (WSL) has about 5 GB of memory: build the generated code on a lab server, or
+  use `GOFLAGS=-p=2`.
 * GitHub repository settings match the Hostinger repository: Dependabot alerts and security
   updates (the `dependency-review` job needs them), delete branches after merge, auto-merge, no
   merge commits. There is no branch ruleset yet.
+* GitHub Actions: CI, Security, Scorecard and "End to End (Superset in Docker)" pass on `main`. The
+  end-to-end workflow takes about an hour per API variant.
 
 ## Open items
 
-1. Watch the upstream pull requests. When they merge and a release has them, drop the `replace`.
-2. Merge pull request #3 when its checks pass, and the Dependabot pull requests #1 and #2.
-3. Ask the user about a branch ruleset like Hostinger's ("Protect main") and about publishing:
+1. Watch the upstream pull requests #90 to #98. Address review comments on the `pr/*` branches,
+   and port changes to `crossplane-integration` (push it, then bump the pseudo-version in `go.mod`).
+   When a release has all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION`.
+2. Ask the user about a branch ruleset like Hostinger's ("Protect main") and about publishing:
    `RELEASE_ENABLED`, the `XPKG_MIRROR_*` secrets and the Upbound repository
-   `codejourney/provider-superset`. The release now waits for both CI and the end-to-end test.
-4. Destroy the lab when the user no longer needs it (see the command in `hack/lab/main.tf`'s
-   directory: `terraform -chdir=hack/lab destroy -var-file=../../_debug/lab/lab.tfvars
-   -state=../../_debug/lab/terraform.tfstate`).
+   `codejourney/provider-superset`. The release waits for both CI and the end-to-end test.
 
 ## Known problems
 
