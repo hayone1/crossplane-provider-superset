@@ -5,10 +5,12 @@ before you stop (see the `session-handoff` skill). Never put secret values here.
 
 ## Last updated
 
-2026-11-10 (first session): the provider is generated, configured, documented, reviewed in two
+2026-11-10 (first session): the provider is generated, configured, documented, reviewed in three
 subagent rounds, and passes the end-to-end test against Superset 6.1 in both API variants. Nine
-fixes to the Terraform provider are open upstream as pull requests #90 to #98. The code is pushed
-to GitHub; nothing is published as a package yet (`RELEASE_ENABLED` is not set).
+fixes to the Terraform provider are open upstream as pull requests #90 to #98. The repository
+github.com/hayone1/crossplane-provider-superset has the initial commit on `main` and the fixes of
+the third review in pull request #3. Nothing is published as a package yet (`RELEASE_ENABLED` is
+not set).
 
 ## State
 
@@ -63,7 +65,9 @@ Pull requests to platacard/terraform-provider-superset, from branches of the for
 | #98 | `pr/import-outdated-hash` | An import keeps an `"outdated"` hash when an object is gone | #92 |
 
 `../terraform-provider-superset` has the branch `crossplane-integration` (all fixes, on the module
-path of #90) and the remote `fork`. When a fix changes, update its `pr/*` branch and the
+path of #90, pushed to the fork) and the remote `fork`. The `feat/*` and `fix/*` branches are the
+working copies that the integration branch merged; the `pr/*` branches (worktree
+`../tfp-superset-prs`) are what the pull requests show. When a fix changes, update its `pr/*` branch and the
 integration branch, push both, and bump the pseudo-version in `go.mod`. When upstream releases
 all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefile.
 
@@ -76,16 +80,18 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
   `TF_VAR_hcloud_token` in `.env`. See "Open items" about destroying it.
 * The local machine (WSL) has about 5 GB of memory: build the generated code on the lab, or use
   `GOFLAGS=-p=2`.
-* Worktrees of the Terraform provider: `../tfp-superset-prs` (PR branches),
-  `../tfp-superset-{ratelimit,triggers,imports,integration}` (working copies; can be removed with
-  `git worktree remove`).
+* GitHub repository settings match the Hostinger repository: Dependabot alerts and security
+  updates (the `dependency-review` job needs them), delete branches after merge, auto-merge, no
+  merge commits. There is no branch ruleset yet.
 
 ## Open items
 
 1. Watch the upstream pull requests. When they merge and a release has them, drop the `replace`.
-2. Repository settings like the Hostinger repository (branch ruleset, auto-merge, Dependabot
-   security updates) and `RELEASE_ENABLED`, `XPKG_MIRROR_*` secrets for publishing: ask the user.
-3. Destroy the lab when the user no longer needs it (see the command in `hack/lab/main.tf`'s
+2. Merge pull request #3 when its checks pass, and the Dependabot pull requests #1 and #2.
+3. Ask the user about a branch ruleset like Hostinger's ("Protect main") and about publishing:
+   `RELEASE_ENABLED`, the `XPKG_MIRROR_*` secrets and the Upbound repository
+   `codejourney/provider-superset`. The release now waits for both CI and the end-to-end test.
+4. Destroy the lab when the user no longer needs it (see the command in `hack/lab/main.tf`'s
    directory: `terraform -chdir=hack/lab destroy -var-file=../../_debug/lab/lab.tfvars
    -state=../../_debug/lab/terraform.tfstate`).
 
