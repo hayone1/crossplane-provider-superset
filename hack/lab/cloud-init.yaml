@@ -15,7 +15,7 @@ packages:
 runcmd:
   - set -eux
   - curl -fsSL https://get.docker.com | sh
-  - curl -fsSL https://go.dev/dl/go1.26.10.linux-amd64.tar.gz | tar -C /usr/local -xz
+  - curl -fsSL https://go.dev/dl/go1.26.11.linux-amd64.tar.gz | tar -C /usr/local -xz
   - echo 'export PATH=/usr/local/go/bin:/root/go/bin:$PATH' > /etc/profile.d/go.sh
   - export PATH=/usr/local/go/bin:/root/go/bin:$PATH HOME=/root GOPATH=/root/go
   - go install sigs.k8s.io/kind@latest
