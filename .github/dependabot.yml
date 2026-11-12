@@ -44,3 +44,11 @@ updates:
         update-types: [version-update:semver-major, version-update:semver-minor]
       - dependency-name: postgres
         update-types: [version-update:semver-major]
+
+  # Keeps the digest-pinned distroless base image current.
+  - package-ecosystem: docker
+    directory: /cluster/images/provider-superset
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: fix(deps)
