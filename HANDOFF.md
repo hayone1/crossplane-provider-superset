@@ -5,12 +5,22 @@ before you stop (see the `session-handoff` skill). Never put secret values here.
 
 ## Last updated
 
-2026-11-10 (first session): the provider is generated, configured, documented, reviewed in three
-subagent rounds, and passes the end-to-end test against Superset 6.1 in both API variants, on the
-lab and in GitHub Actions. Nine fixes to the Terraform provider are open upstream as pull requests
-#90 to #98. `main` of github.com/hayone1/crossplane-provider-superset has everything (pull
-requests #1 to #3 merged). The Hetzner lab is destroyed. Nothing is published as a package yet
-(`RELEASE_ENABLED` is not set).
+2026-11-13 (third session): the upstream maintainer reviewed #90 to #98 on 2026-11-13. #92, #94,
+#95, #97 and #98 are approved. #91, #93, #96 and #90 had golangci-lint findings in their tests
+(forcetypeassert, usetesting); each now has a fix commit, and a reply is on each pull request.
+#96 was rebased onto the fixed #93 (force-pushed). The fixes touch only tests, so
+`crossplane-integration` and the `go.mod` pseudo-version are unchanged.
+
+2026-11-11 (second session): publishing is on. `RELEASE_ENABLED=true`; the secrets
+`XPKG_MIRROR_ACCESS_ID` and `XPKG_MIRROR_TOKEN` are the Upbound robot of the Hostinger setup, whose
+team has Write on `codejourney/provider-superset`. v0.1.0 is released to
+`ghcr.io/hayone1/provider-superset` and `xpkg.upbound.io/codejourney/provider-superset` (signed,
+with an SBOM and attestations). Every push to `main` that passes CI and the end-to-end test makes
+a release.
+
+2026-11-10 (first session): the provider is generated, configured, documented, reviewed, and
+passes the end-to-end test against Superset 6.1 in both API variants. The Hetzner lab is
+destroyed.
 
 ## State
 
@@ -86,12 +96,15 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
 
 ## Open items
 
-1. Watch the upstream pull requests #90 to #98. Address review comments on the `pr/*` branches,
-   and port changes to `crossplane-integration` (push it, then bump the pseudo-version in `go.mod`).
-   When a release has all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION`.
-2. Ask the user about a branch ruleset like Hostinger's ("Protect main") and about publishing:
-   `RELEASE_ENABLED`, the `XPKG_MIRROR_*` secrets and the Upbound repository
-   `codejourney/provider-superset`. The release waits for both CI and the end-to-end test.
+1. Watch the upstream pull requests #90 to #98. The maintainer merges in this order: #91 then
+   #97; #92 then #98; #93 then #96; #94 and #95; #90 last. **When all others are merged, rebase
+   #90 onto `origin/main`** so the module path rename covers their files (it conflicts with #92 in
+   `internal/provider/import_resource.go`). Check lint with the pinned golangci-lint v1.64.8
+   built with Go 1.25 (`GOTOOLCHAIN=go1.25.8 go install
+   github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; a build with Go 1.27 fails to
+   type-check). Port code changes to `crossplane-integration` and bump the pseudo-version in
+   `go.mod`. When a release has all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION`.
+2. Ask the user about a branch ruleset like Hostinger's ("Protect main").
 
 ## Known problems
 
