@@ -1,6 +1,8 @@
 # This example runs a SQL statement through SQL Lab: it creates a view, and it drops the view
 # when you delete the managed resource. The connection must allow DML (allowDml) for a
 # statement that changes data or structure. To run the statement again, change triggers.
+# The example names the connection by its ID (databaseIdRef), so that the managed resource can
+# also take over an existing run by its external name without running the statement again.
 # e2e-update: SQLExecution/daily-sales {"spec":{"forProvider":{"triggers":{"version":"2"}}}}
 apiVersion: v1
 kind: Secret
@@ -40,7 +42,7 @@ metadata:
   name: daily-sales
 spec:
   forProvider:
-    databaseNameRef:
+    databaseIdRef:
       name: sql-db
     schema: public
     sql: CREATE OR REPLACE VIEW daily_sales AS SELECT day, SUM(amount) AS amount FROM sales GROUP BY day

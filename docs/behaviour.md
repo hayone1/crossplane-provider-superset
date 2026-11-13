@@ -107,6 +107,8 @@ applies to no role.
 Observing an object needs only the external name, with these exceptions:
 
 * A RolePermissions needs `roleName`, because the provider finds the role by its name.
+* A SQLExecution needs `databaseId` (or `databaseIdRef`). With only `databaseName`, the provider
+  cannot find the connection, and it runs the statement again.
 * An import kind cannot observe objects. It imports its bundle again, which overwrites the objects
   with the same UUIDs, and then manages them.
 
@@ -260,7 +262,8 @@ provider runs.
 
 A SQLExecution runs its `sql` through SQL Lab when the provider creates it, and again whenever
 `triggers` changes. Its external name is the ID of the last run in the query history of SQL Lab.
-After the run, the provider only checks that the database connection still exists. It does not
+After the run, the provider only checks that the database connection still exists. To take
+over a run with the external name, set `databaseId` (or `databaseIdRef`), not only `databaseName`. It does not
 check what the statement made, so a view that someone drops in Superset stays dropped until
 `triggers` changes. If the connection is deleted and created again, the provider runs the
 statement again on the new connection.
