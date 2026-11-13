@@ -5,6 +5,12 @@ before you stop (see the `session-handoff` skill). Never put secret values here.
 
 ## Last updated
 
+2026-11-13 (third session, later): `main` is protected by the ruleset "Protect main" (id
+27182339), a copy of Hostinger's. Changes go through pull requests (squash or rebase, resolved
+threads, no approvals needed). The branch must be up to date, and these checks must pass: lint,
+unit-tests, check-diff, local-deploy, e2e (cluster), e2e (namespaced), govulncheck, gitleaks and
+codeql. No force pushes, no deletion. Push a branch and use `gh pr merge --auto --squash`.
+
 2026-11-13 (third session): the upstream maintainer reviewed #90 to #98 on 2026-11-13. #92, #94,
 #95, #97 and #98 are approved. #91, #93, #96 and #90 had golangci-lint findings in their tests
 (forcetypeassert, usetesting); each now has a fix commit, and a reply is on each pull request.
@@ -90,7 +96,8 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
   use `GOFLAGS=-p=2`.
 * GitHub repository settings match the Hostinger repository: Dependabot alerts and security
   updates (the `dependency-review` job needs them), delete branches after merge, auto-merge, no
-  merge commits. There is no branch ruleset yet.
+  merge commits. The ruleset "Protect main" requires pull requests and the CI, Security and
+  end-to-end checks.
 * GitHub Actions: CI, Security, Scorecard and "End to End (Superset in Docker)" pass on `main`. The
   end-to-end workflow takes about an hour per API variant.
 
@@ -104,7 +111,6 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
    github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; a build with Go 1.27 fails to
    type-check). Port code changes to `crossplane-integration` and bump the pseudo-version in
    `go.mod`. When a release has all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION`.
-2. Ask the user about a branch ruleset like Hostinger's ("Protect main").
 
 ## Known problems
 
