@@ -121,6 +121,7 @@ func (tr *User) LateInitialize(attrs []byte) (bool, error) {
 	opts = append(opts, resource.WithNameFilter("Active"))
 	opts = append(opts, resource.WithNameFilter("Email"))
 	opts = append(opts, resource.WithNameFilter("FirstName"))
+	opts = append(opts, resource.WithNameFilter("Groups"))
 	opts = append(opts, resource.WithNameFilter("LastName"))
 	opts = append(opts, resource.WithNameFilter("Password"))
 	opts = append(opts, resource.WithNameFilter("Roles"))

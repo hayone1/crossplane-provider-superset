@@ -27,6 +27,26 @@ func (mg *Chart) ResolveReferences( // ResolveReferences of this Chart.
 	var mrsp reference.MultiResolutionResponse
 	var err error
 	{
+		m, l, err = apisresolver.GetManagedResource("dashboard.superset.crossplane.io", "v1alpha1", "Dashboard", "DashboardList")
+		if err != nil {
+			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
+		}
+
+		mrsp, err = r.ResolveMultiple(ctx, reference.MultiResolutionRequest{
+			CurrentValues: reference.FromFloatPtrValues(mg.Spec.ForProvider.Dashboards),
+			Extract:       reference.ExternalName(),
+			Namespace:     mg.GetNamespace(),
+			References:    mg.Spec.ForProvider.DashboardsRefs,
+			Selector:      mg.Spec.ForProvider.DashboardsSelector,
+			To:            reference.To{List: l, Managed: m},
+		})
+	}
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.Dashboards")
+	}
+	mg.Spec.ForProvider.Dashboards = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.DashboardsRefs = mrsp.ResolvedReferences
+	{
 		m, l, err = apisresolver.GetManagedResource("dataset.superset.crossplane.io", "v1alpha1", "Dataset", "DatasetList")
 		if err != nil {
 			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
@@ -86,6 +106,26 @@ func (mg *Chart) ResolveReferences( // ResolveReferences of this Chart.
 	}
 	mg.Spec.ForProvider.Tags = reference.ToPtrValues(mrsp.ResolvedValues)
 	mg.Spec.ForProvider.TagsRefs = mrsp.ResolvedReferences
+	{
+		m, l, err = apisresolver.GetManagedResource("dashboard.superset.crossplane.io", "v1alpha1", "Dashboard", "DashboardList")
+		if err != nil {
+			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
+		}
+
+		mrsp, err = r.ResolveMultiple(ctx, reference.MultiResolutionRequest{
+			CurrentValues: reference.FromFloatPtrValues(mg.Spec.InitProvider.Dashboards),
+			Extract:       reference.ExternalName(),
+			Namespace:     mg.GetNamespace(),
+			References:    mg.Spec.InitProvider.DashboardsRefs,
+			Selector:      mg.Spec.InitProvider.DashboardsSelector,
+			To:            reference.To{List: l, Managed: m},
+		})
+	}
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.Dashboards")
+	}
+	mg.Spec.InitProvider.Dashboards = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.DashboardsRefs = mrsp.ResolvedReferences
 	{
 		m, l, err = apisresolver.GetManagedResource("dataset.superset.crossplane.io", "v1alpha1", "Dataset", "DatasetList")
 		if err != nil {

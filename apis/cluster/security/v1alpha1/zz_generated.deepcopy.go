@@ -1163,6 +1163,29 @@ func (in *UserInitParameters) DeepCopyInto(out *UserInitParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Groups != nil {
+		in, out := &in.Groups, &out.Groups
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
+	if in.GroupsRefs != nil {
+		in, out := &in.GroupsRefs, &out.GroupsRefs
+		*out = make([]v2.Reference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.GroupsSelector != nil {
+		in, out := &in.GroupsSelector, &out.GroupsSelector
+		*out = new(v2.Selector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LastName != nil {
 		in, out := &in.LastName, &out.LastName
 		*out = new(string)
@@ -1263,6 +1286,17 @@ func (in *UserObservation) DeepCopyInto(out *UserObservation) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Groups != nil {
+		in, out := &in.Groups, &out.Groups
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
 	if in.ID != nil {
 		in, out := &in.ID, &out.ID
 		*out = new(string)
@@ -1323,6 +1357,29 @@ func (in *UserParameters) DeepCopyInto(out *UserParameters) {
 		in, out := &in.FirstName, &out.FirstName
 		*out = new(string)
 		**out = **in
+	}
+	if in.Groups != nil {
+		in, out := &in.Groups, &out.Groups
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
+	if in.GroupsRefs != nil {
+		in, out := &in.GroupsRefs, &out.GroupsRefs
+		*out = make([]v2.Reference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.GroupsSelector != nil {
+		in, out := &in.GroupsSelector, &out.GroupsSelector
+		*out = new(v2.Selector)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.LastName != nil {
 		in, out := &in.LastName, &out.LastName

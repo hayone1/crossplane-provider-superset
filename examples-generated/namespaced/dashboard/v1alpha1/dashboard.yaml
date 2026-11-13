@@ -9,6 +9,8 @@ metadata:
   namespace: default
 spec:
   forProvider:
+    externalUrl: https://git.example.com/analytics/blob/main/superset/dashboards.tf
+    isManagedExternally: true
     jsonMetadata: |-
       ${jsonencode({
           refresh_frequency = 300

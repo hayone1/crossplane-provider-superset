@@ -115,23 +115,25 @@ Observing an object needs only the external name, with these exceptions:
 The provider makes the object match `spec.forProvider`, as Terraform makes an object match its
 configuration. A field that you leave out does one of three things:
 
-1. **Superset keeps its value.** This is true only for fields that Superset fills in itself. People
-   can then change these fields in Superset, and the provider leaves the change alone:
+1. **Superset keeps its value.** This is true only for fields that Superset fills in itself, and
+   for links that you can set from either side (see below). People can then change these fields
+   in Superset, and the provider leaves the change alone:
 
    | Kind | Fields |
    |------|--------|
-   | Chart | `owners`, `queryContext`, `tags` |
+   | Chart | `dashboards`, `owners`, `queryContext`, `tags` |
    | Dashboard | `jsonMetadata`, `owners`, `positionJson`, `tags` |
    | Database | `cacheTimeout`, `extra` |
-   | Dataset | `columns`, `mainDttmCol`, `metrics`, `owners` |
+   | Dataset | `catalog`, `columns`, `mainDttmCol`, `metrics`, `owners` |
+   | Group | `users` |
    | Report | `gracePeriod`, `logRetention`, `owners`, `reportFormat`, `timezone`, `workingTimeout` |
+   | User | `groups` |
 
 2. **The field gets its default.** The description of such a field in the CRD names the default,
    for example `published` of a Dashboard or `active` of a User. Run
    `kubectl explain <kind>.<group>.superset.crossplane.io.spec.forProvider.<field>` to read it.
 3. **The field becomes empty in Superset.** This is true for every other field. For example, a
-   RowLevelSecurity without `roles` applies to no role, and a Group without `users` has no members.
-   The provider removes members that people add in Superset.
+   RowLevelSecurity without `roles` applies to no role.
 
 So describe every value that matters to you in `spec.forProvider`. The provider does not copy the
 values of Superset into `spec.forProvider` (Crossplane calls this late initialization, and the
@@ -146,6 +148,18 @@ Some fields own a whole list once you set them:
   provider removes any other permission of the role.
 * The `roles` of a User. A User needs `roles` or `rolesRefs`.
 
+Some links can be set from either side. Set each one from one side only, or the two managed
+resources keep changing it back:
+
+* The members of a group: the `users` of a Group, or the `groups` of a User.
+* The dashboards of a chart: the `positionJson` of a Dashboard, which also places the chart on the
+  dashboard, or the `dashboards` of a Chart, which only links it. A linked chart without a place in
+  the layout is listed on the dashboard but not shown.
+
+An empty list, such as `users: []`, is the same as leaving the field out, so Superset keeps the
+links. To remove all members of a group, remove them in Superset, or set `users` on the Group to
+manage them there.
+
 `spec.initProvider` does not help here. For these kinds, the provider applies `spec.initProvider`
 at every check, not only when it creates the object, so it behaves like `spec.forProvider`.
 
@@ -159,12 +173,15 @@ When an object no longer exists, the provider creates it again with a new ID.
 
 Some fields cannot change on an existing object:
 
-* the `databaseName` of a Dataset,
 * the `username` of a User,
 * the `layerId` of an Annotation,
 * the `dashboardId` of a DashboardEmbedding,
-* the `datasetId` of a DatasetRefresh, and
-* the `databaseId` of a DatabasePermissionsSync.
+* the `datasetId` of a DatasetRefresh,
+* the `databaseId` of a DatabasePermissionsSync, and
+* the `sql`, `databaseName`, `databaseId`, `schema` and `catalog` of a SQLExecution.
+
+A new `databaseName` of a Dataset does not need a new object: Superset moves the dataset to the
+other connection, and the dataset keeps its ID and its charts.
 
 Terraform replaces the object in this case. The provider does not delete and recreate objects for
 you. It reports the change as an error instead. To make the change, delete the managed resource,
@@ -179,6 +196,8 @@ behave differently:
 * **DatasetRefresh** and **DatabasePermissionsSync** do nothing. The dataset or the connection
   stays as it is.
 * **DashboardEmbedding** turns embedding off for the dashboard.
+* **SQLExecution** runs its `destroySql`, for example `DROP VIEW IF EXISTS daily_sales`. Without
+  `destroySql`, or when the connection no longer exists, it does nothing.
 * **The import kinds** delete the imported objects of their kind, as
   [Dashboards and imports](dashboards.md) describes. Database connections stay.
 
@@ -236,6 +255,24 @@ After the provider restarts, the provider rebuilds what it knows about each obje
 current Secrets. A Secret that changed while the provider was stopped therefore looks unchanged.
 So the provider does not send the new value. To send it, change the Secret once more while the
 provider runs.
+
+## SQL statements
+
+A SQLExecution runs its `sql` through SQL Lab when the provider creates it, and again whenever
+`triggers` changes. Its external name is the ID of the last run in the query history of SQL Lab.
+After the run, the provider only checks that the database connection still exists. It does not
+check what the statement made, so a view that someone drops in Superset stays dropped until
+`triggers` changes. If the connection is deleted and created again, the provider runs the
+statement again on the new connection.
+
+The connection must be exposed in SQL Lab (`exposeInSqllab`). For a statement that changes data
+or structure, it must also allow DML (`allowDml`).
+
+Write statements that can run twice without harm, such as `CREATE OR REPLACE VIEW` or
+`CREATE TABLE IF NOT EXISTS`. A statement runs while the reconcile waits, and Crossplane stops a
+reconcile after three minutes (see the next section). If Superset finishes a slow statement after
+that, the provider can run it again. Keep long work out of a SQLExecution, for example in a
+scheduled job of the database.
 
 ## Which values the provider checks
 

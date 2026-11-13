@@ -36,7 +36,8 @@ var kinds = map[string]kindInfo{
 	"superset_theme":               {"theme", "Theme"},
 
 	// SQL Lab.
-	"superset_saved_query": {"sqllab", "SavedQuery"},
+	"superset_saved_query":   {"sqllab", "SavedQuery"},
+	"superset_sql_execution": {"sqllab", "SQLExecution"},
 
 	// Annotations that charts show on their time axis.
 	"superset_annotation_layer": {"annotation", "AnnotationLayer"},
@@ -80,7 +81,8 @@ var references = map[string]map[string]ujconfig.Reference{
 		"resource_permissions.view_menu": {TerraformName: "superset_dataset", Extractor: extractDatasetPerm},
 	},
 	"superset_user": {
-		"roles": {TerraformName: "superset_role"},
+		"roles":  {TerraformName: "superset_role"},
+		"groups": {TerraformName: "superset_group"},
 	},
 	"superset_group": {
 		"roles": {TerraformName: "superset_role"},
@@ -105,6 +107,7 @@ var references = map[string]map[string]ujconfig.Reference{
 	},
 	"superset_chart": {
 		"datasource_id": {TerraformName: "superset_dataset"},
+		"dashboards":    {TerraformName: "superset_dashboard"},
 		"owners":        {TerraformName: "superset_user"},
 		"tags":          {TerraformName: "superset_tag", Extractor: extractName},
 	},
@@ -119,6 +122,10 @@ var references = map[string]map[string]ujconfig.Reference{
 	},
 	"superset_saved_query": {
 		"database_id": {TerraformName: "superset_database"},
+	},
+	"superset_sql_execution": {
+		"database_id":   {TerraformName: "superset_database"},
+		"database_name": {TerraformName: "superset_database", Extractor: extractConnectionName},
 	},
 	"superset_annotation": {
 		"layer_id": {TerraformName: "superset_annotation_layer"},

@@ -32,6 +32,7 @@ import (
 	rowlevelsecurity "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/security/rowlevelsecurity"
 	user "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/security/user"
 	savedquery "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/sqllab/savedquery"
+	sqlexecution "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/sqllab/sqlexecution"
 	tag "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/tag/tag"
 	theme "github.com/hayone1/crossplane-provider-superset/internal/controller/cluster/theme/theme"
 )
@@ -63,6 +64,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		rowlevelsecurity.Setup,
 		user.Setup,
 		savedquery.Setup,
+		sqlexecution.Setup,
 		tag.Setup,
 		theme.Setup,
 	} {
@@ -100,6 +102,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		rowlevelsecurity.SetupGated,
 		user.SetupGated,
 		savedquery.SetupGated,
+		sqlexecution.SetupGated,
 		tag.SetupGated,
 		theme.SetupGated,
 	} {
@@ -136,6 +139,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		rowlevelsecurity.SetupWebhookWithManager,
 		user.SetupWebhookWithManager,
 		savedquery.SetupWebhookWithManager,
+		sqlexecution.SetupWebhookWithManager,
 		tag.SetupWebhookWithManager,
 		theme.SetupWebhookWithManager,
 	} {

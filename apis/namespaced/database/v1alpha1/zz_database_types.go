@@ -71,6 +71,10 @@ type DatabaseInitParameters struct {
 	// Whether the connection is available in SQL Lab.
 	ExposeInSqllab *bool `json:"exposeInSqllab,omitempty" tf:"expose_in_sqllab,omitempty"`
 
+	// (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
 	// JSON document with the extra configuration of the connection, such as `engine_params`, `metadata_params` or `schemas_allowed_for_file_upload`. Defaults to `{"client_encoding": "utf8"}` when the connection is created without it.
 	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
@@ -82,6 +86,9 @@ type DatabaseInitParameters struct {
 	// in user instead of the user of the connection. Defaults to false.
 	// Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
 	ImpersonateUser *bool `json:"impersonateUser,omitempty" tf:"impersonate_user,omitempty"`
+
+	// (Boolean) Whether the connection is managed outside Superset, for example by Crossplane. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to false. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String, Sensitive) JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.
 	// JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.
@@ -153,6 +160,10 @@ type DatabaseObservation struct {
 	// Whether the connection is available in SQL Lab.
 	ExposeInSqllab *bool `json:"exposeInSqllab,omitempty" tf:"expose_in_sqllab,omitempty"`
 
+	// (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
 	// JSON document with the extra configuration of the connection, such as `engine_params`, `metadata_params` or `schemas_allowed_for_file_upload`. Defaults to `{"client_encoding": "utf8"}` when the connection is created without it.
 	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
@@ -168,12 +179,19 @@ type DatabaseObservation struct {
 	// Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
 	ImpersonateUser *bool `json:"impersonateUser,omitempty" tf:"impersonate_user,omitempty"`
 
+	// (Boolean) Whether the connection is managed outside Superset, for example by Crossplane. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to false. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
+
 	// (Attributes) SSH tunnel through which Superset reaches the database. Requires the SSH_TUNNELING feature flag in Superset. Superset authenticates with either password or private_key; the private key must be an RSA key. (see below for nested schema)
 	SSHTunnel *SSHTunnelObservation `json:"sshTunnel,omitempty" tf:"ssh_tunnel,omitempty"`
 
 	// (String) CA bundle, in PEM format, used to validate the certificate of the database server.
 	// CA bundle, in PEM format, used to validate the certificate of the database server.
 	ServerCert *string `json:"serverCert,omitempty" tf:"server_cert,omitempty"`
+
+	// (String) UUID of the connection, the identifier used in export files.
+	// UUID of the connection, the identifier used in export files.
+	UUID *string `json:"uuid,omitempty" tf:"uuid,omitempty"`
 }
 
 type DatabaseParameters struct {
@@ -248,6 +266,11 @@ type DatabaseParameters struct {
 	// +kubebuilder:validation:Optional
 	ExposeInSqllab *bool `json:"exposeInSqllab,omitempty" tf:"expose_in_sqllab,omitempty"`
 
+	// (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// +kubebuilder:validation:Optional
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
 	// JSON document with the extra configuration of the connection, such as `engine_params`, `metadata_params` or `schemas_allowed_for_file_upload`. Defaults to `{"client_encoding": "utf8"}` when the connection is created without it.
 	// +kubebuilder:validation:Optional
@@ -262,6 +285,10 @@ type DatabaseParameters struct {
 	// Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
 	// +kubebuilder:validation:Optional
 	ImpersonateUser *bool `json:"impersonateUser,omitempty" tf:"impersonate_user,omitempty"`
+
+	// (Boolean) Whether the connection is managed outside Superset, for example by Crossplane. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to false. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to `false`.
+	// +kubebuilder:validation:Optional
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String, Sensitive) JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.
 	// JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.

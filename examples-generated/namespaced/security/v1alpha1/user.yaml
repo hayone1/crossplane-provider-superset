@@ -20,3 +20,20 @@ spec:
     - name: example
     - name: example
     username: example.user
+
+---
+
+apiVersion: security.superset.m.crossplane.io/v1alpha1
+kind: Group
+metadata:
+  annotations:
+    meta.upbound.io/example-id: security/v1alpha1/user
+  labels:
+    testing.upbound.io/example-name: analysts
+  name: analysts
+  namespace: default
+spec:
+  forProvider:
+    name: analysts
+    rolesRefs:
+    - name: example

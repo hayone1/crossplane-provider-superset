@@ -32,7 +32,8 @@ spec:
     - expression: COUNT(*)
       metricName: count
       verboseName: Sales
-    - d3format: ',.2f'
+    - currency: ${jsonencode({ symbol = "USD", symbolPosition = "prefix" })}
+      d3format: ',.2f'
       expression: SUM(amount)
       metricName: revenue
       verboseName: Revenue

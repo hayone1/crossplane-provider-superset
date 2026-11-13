@@ -20,7 +20,7 @@ needs no Terraform binary, and the resources behave like their Terraform counter
 
 ## What you can manage
 
-The provider has 24 managed resources in 11 API groups:
+The provider has 25 managed resources in 11 API groups:
 
 | Area | Kinds |
 |------|-------|
@@ -28,7 +28,7 @@ The provider has 24 managed resources in 11 API groups:
 | Database connections | Database, MetaDatabase, DatabasePermissionsSync |
 | Datasets | Dataset, DatasetRefresh |
 | Charts and dashboards | Chart, Dashboard, DashboardEmbedding, CSSTemplate, Theme |
-| SQL Lab | SavedQuery |
+| SQL Lab | SavedQuery, SQLExecution |
 | Annotations | AnnotationLayer, Annotation |
 | Tags | Tag |
 | Alerts and reports | Report |
@@ -212,7 +212,7 @@ kind in both API variants.
 | Existing objects | `terraform import` | The `crossplane.io/external-name` annotation, set to the numeric ID |
 | Settings left out | Empty in Superset, or the default, except a few fields that Superset fills | The same ([Behaviour](docs/behaviour.md#settings-that-you-leave-out) lists them). Late initialization is off, so `spec.forProvider` holds only what you set, and `status.atProvider` shows the rest. |
 | Validation | When Terraform plans | Before each create and update, with the same checks |
-| Data sources | 14 | None. Crossplane manages objects. Use `status.atProvider` of a managed resource, or the Superset API. |
+| Data sources | 16 | None. Crossplane manages objects. Use `status.atProvider` of a managed resource, or the Superset API. |
 
 ## Development
 

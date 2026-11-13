@@ -1,0 +1,37 @@
+apiVersion: sqllab.superset.crossplane.io/v1alpha1
+kind: SQLExecution
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sqllab/v1alpha1/sqlexecution
+  labels:
+    testing.upbound.io/example-name: daily_sales
+  name: daily-sales
+spec:
+  forProvider:
+    databaseNameSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
+    destroySql: DROP VIEW IF EXISTS daily_sales
+    schema: public
+    sql: CREATE OR REPLACE VIEW daily_sales AS SELECT day, sum(amount) AS amount FROM
+      sales GROUP BY day
+    triggers:
+      version: "1"
+
+---
+
+apiVersion: dataset.superset.crossplane.io/v1alpha1
+kind: Dataset
+metadata:
+  annotations:
+    meta.upbound.io/example-id: sqllab/v1alpha1/sqlexecution
+  labels:
+    testing.upbound.io/example-name: daily_sales
+  name: daily-sales
+spec:
+  forProvider:
+    databaseNameSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
+    schema: public
+    tableName: daily_sales

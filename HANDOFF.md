@@ -5,6 +5,14 @@ before you stop (see the `session-handoff` skill). Never put secret values here.
 
 ## Last updated
 
+2026-11-13 (fourth session): upstream merged #91 to #98, plus its own features #99 to #105
+(SQL execution, user groups, chart dashboards, managed externally + uuid, more dataset settings,
+two data sources). #90 was rebased onto upstream main (`199767d`, force-pushed, CI green) and
+waits for the merge. This project now builds that commit (`go.mod` replace to the fork,
+branch `pr/public-provider-package`), adds the kind SQLExecution (`sqllab`), the references
+User.groups and Chart.dashboards, and docs for the new behaviour. Pull request on branch
+`feat/upstream-main`. The branch `crossplane-integration` is no longer used.
+
 2026-11-13 (third session, later): `main` is protected by the ruleset "Protect main" (id
 27182339), a copy of Hostinger's. Changes go through pull requests (squash or rebase, resolved
 threads, no approvals needed). The branch must be up to date, and these checks must pass: lint,
@@ -30,13 +38,13 @@ destroyed.
 
 ## State
 
-* **Generated:** Upjet v2.5.1 generates all 24 resources of the Terraform provider in both scopes.
+* **Generated:** Upjet v2.5.1 generates all 25 resources of the Terraform provider in both scopes.
   `make generate` from the fork reproduces the committed files exactly. Crossplane runtime and
   tool versions follow `../crossplane-provider-wso2is`.
-* **Terraform provider:** `github.com/platacard/terraform-provider-superset` v1.0.0 (2026-11-08,
-  the most complete Superset provider: 24 resources, plugin framework). `go.mod` replaces it with
-  the branch `crossplane-integration` of the fork `github.com/hayone1/terraform-provider-superset`
-  (pseudo-version of commit `e68d1dc`), which holds all nine fixes.
+* **Terraform provider:** `github.com/platacard/terraform-provider-superset`, `main` after v1.0.0
+  (25 resources, plugin framework). Until upstream merges #90 (module path + public `provider`
+  package), `go.mod` replaces it with the fork `github.com/hayone1/terraform-provider-superset` at
+  `199767d` (branch `pr/public-provider-package` = upstream main + #90).
 * **Hand-written configuration:**
   * `config/external_name.go`: numeric IDs (the `"0"` sentinel before a create, a number-aware
     external name, `idAsString` conversion for `status.atProvider.id`, `stateWithout` empty-state
@@ -80,12 +88,9 @@ Pull requests to platacard/terraform-provider-superset, from branches of the for
 | #97 | `pr/retry-rate-limit` | Retry 429 Too Many Requests with backoff and jitter | #91 |
 | #98 | `pr/import-outdated-hash` | An import keeps an `"outdated"` hash when an object is gone | #92 |
 
-`../terraform-provider-superset` has the branch `crossplane-integration` (all fixes, on the module
-path of #90, pushed to the fork) and the remote `fork`. The `feat/*` and `fix/*` branches are the
-working copies that the integration branch merged; the `pr/*` branches (worktree
-`../tfp-superset-prs`) are what the pull requests show. When a fix changes, update its `pr/*` branch and the
-integration branch, push both, and bump the pseudo-version in `go.mod`. When upstream releases
-all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefile.
+All nine are merged upstream except #90 (2026-11-13). `../terraform-provider-superset` has the
+remote `fork`; the `pr/*` branches (worktree `../tfp-superset-prs`) are what the pull requests
+show. `crossplane-integration`, `feat/*` and `fix/*` are obsolete.
 
 ## Environment
 
@@ -103,14 +108,14 @@ all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION` in the Makefi
 
 ## Open items
 
-1. Watch the upstream pull requests #90 to #98. The maintainer merges in this order: #91 then
-   #97; #92 then #98; #93 then #96; #94 and #95; #90 last. **When all others are merged, rebase
-   #90 onto `origin/main`** so the module path rename covers their files (it conflicts with #92 in
-   `internal/provider/import_resource.go`). Check lint with the pinned golangci-lint v1.64.8
-   built with Go 1.25 (`GOTOOLCHAIN=go1.25.8 go install
-   github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; a build with Go 1.27 fails to
-   type-check). Port code changes to `crossplane-integration` and bump the pseudo-version in
-   `go.mod`. When a release has all fixes, drop the `replace` and set `TERRAFORM_PROVIDER_VERSION`.
+1. When upstream merges #90: replace the `replace` in `go.mod` by a pseudo-version of the upstream
+   merge commit (`go get github.com/platacard/terraform-provider-superset@<sha>`), run
+   `make generate`, and update `docs/terraform-provider.md` (drop "waiting to be merged" and the
+   fork paragraph). When upstream releases a version with everything, require that version and
+   set `TERRAFORM_PROVIDER_VERSION` in the Makefile. Lint upstream changes with golangci-lint
+   v1.64.8 built with Go 1.25 (`GOTOOLCHAIN=go1.25.8 go install
+   github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8`; a Go 1.27 build fails to
+   type-check).
 
 ## Known problems
 
