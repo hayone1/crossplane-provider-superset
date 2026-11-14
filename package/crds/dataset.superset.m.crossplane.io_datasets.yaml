@@ -72,6 +72,11 @@ spec:
                       (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                       Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                     type: number
+                  catalog:
+                    description: |-
+                      (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                      Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                    type: string
                   columns:
                     description: (Attributes Set) Columns of the dataset. When unset,
                       the columns are left to Superset, which detects them from the
@@ -82,6 +87,11 @@ spec:
                       clears an attribute. (see below for nested schema)
                     items:
                       properties:
+                        advancedDataType:
+                          description: |-
+                            (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+                            Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+                          type: string
                         columnName:
                           description: |-
                             (String) Name of the column, unique within the dataset.
@@ -97,6 +107,11 @@ spec:
                             (String) SQL expression of a calculated column, for example amount * 100.
                             SQL expression of a calculated column, for example `amount * 100`.
                           type: string
+                        extra:
+                          description: |-
+                            (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                            JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+                          type: string
                         filterable:
                           description: |-
                             (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
@@ -106,6 +121,11 @@ spec:
                           description: |-
                             (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
                             Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isActive:
+                          description: |-
+                            (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+                            Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
                           type: boolean
                         isDttm:
                           description: |-
@@ -129,10 +149,15 @@ spec:
                           type: string
                       type: object
                     type: array
+                  currencyCodeColumn:
+                    description: |-
+                      (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                      Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                    type: string
                   databaseName:
                     description: |-
-                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+                      Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
                     type: string
                   databaseNameRef:
                     description: Reference to a Database in database to populate databaseName.
@@ -224,6 +249,11 @@ spec:
                       text description of the dataset.
                       Free-text description of the dataset.
                     type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   extra:
                     description: |-
                       (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
@@ -239,6 +269,18 @@ spec:
                       (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
                       Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
                     type: boolean
+                  isManagedExternally:
+                    description: (Boolean) Whether the dataset is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dataset and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dataset and disables
+                      its editing in the UI. Defaults to `false`.
+                    type: boolean
+                  isSqllabView:
+                    description: |-
+                      (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+                      Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+                    type: boolean
                   mainDttmCol:
                     description: |-
                       (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
@@ -252,6 +294,11 @@ spec:
                       deleted. (see below for nested schema)'
                     items:
                       properties:
+                        currency:
+                          description: |-
+                            (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+                            JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+                          type: string
                         d3format:
                           description: |-
                             (String) D3 format of the values, for example,.2f.
@@ -294,6 +341,11 @@ spec:
                       (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
                       Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
                     type: boolean
+                  offset:
+                    description: |-
+                      (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+                      Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+                    type: number
                   owners:
                     description: |-
                       (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -430,6 +482,11 @@ spec:
                       (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                       Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                     type: number
+                  catalog:
+                    description: |-
+                      (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                      Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                    type: string
                   columns:
                     description: (Attributes Set) Columns of the dataset. When unset,
                       the columns are left to Superset, which detects them from the
@@ -440,6 +497,11 @@ spec:
                       clears an attribute. (see below for nested schema)
                     items:
                       properties:
+                        advancedDataType:
+                          description: |-
+                            (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+                            Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+                          type: string
                         columnName:
                           description: |-
                             (String) Name of the column, unique within the dataset.
@@ -455,6 +517,11 @@ spec:
                             (String) SQL expression of a calculated column, for example amount * 100.
                             SQL expression of a calculated column, for example `amount * 100`.
                           type: string
+                        extra:
+                          description: |-
+                            (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                            JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+                          type: string
                         filterable:
                           description: |-
                             (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
@@ -464,6 +531,11 @@ spec:
                           description: |-
                             (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
                             Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isActive:
+                          description: |-
+                            (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+                            Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
                           type: boolean
                         isDttm:
                           description: |-
@@ -487,10 +559,15 @@ spec:
                           type: string
                       type: object
                     type: array
+                  currencyCodeColumn:
+                    description: |-
+                      (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                      Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                    type: string
                   databaseName:
                     description: |-
-                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+                      Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
                     type: string
                   databaseNameRef:
                     description: Reference to a Database in database to populate databaseName.
@@ -582,6 +659,11 @@ spec:
                       text description of the dataset.
                       Free-text description of the dataset.
                     type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   extra:
                     description: |-
                       (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
@@ -597,6 +679,18 @@ spec:
                       (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
                       Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
                     type: boolean
+                  isManagedExternally:
+                    description: (Boolean) Whether the dataset is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dataset and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dataset and disables
+                      its editing in the UI. Defaults to `false`.
+                    type: boolean
+                  isSqllabView:
+                    description: |-
+                      (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+                      Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+                    type: boolean
                   mainDttmCol:
                     description: |-
                       (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
@@ -610,6 +704,11 @@ spec:
                       deleted. (see below for nested schema)'
                     items:
                       properties:
+                        currency:
+                          description: |-
+                            (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+                            JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+                          type: string
                         d3format:
                           description: |-
                             (String) D3 format of the values, for example,.2f.
@@ -652,6 +751,11 @@ spec:
                       (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
                       Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
                     type: boolean
+                  offset:
+                    description: |-
+                      (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+                      Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+                    type: number
                   owners:
                     description: |-
                       (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -843,6 +947,11 @@ spec:
                       (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                       Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
                     type: number
+                  catalog:
+                    description: |-
+                      (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                      Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+                    type: string
                   columns:
                     description: (Attributes Set) Columns of the dataset. When unset,
                       the columns are left to Superset, which detects them from the
@@ -853,6 +962,11 @@ spec:
                       clears an attribute. (see below for nested schema)
                     items:
                       properties:
+                        advancedDataType:
+                          description: |-
+                            (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+                            Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+                          type: string
                         columnName:
                           description: |-
                             (String) Name of the column, unique within the dataset.
@@ -868,6 +982,11 @@ spec:
                             (String) SQL expression of a calculated column, for example amount * 100.
                             SQL expression of a calculated column, for example `amount * 100`.
                           type: string
+                        extra:
+                          description: |-
+                            (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+                            JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+                          type: string
                         filterable:
                           description: |-
                             (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
@@ -877,6 +996,11 @@ spec:
                           description: |-
                             (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
                             Whether the column can be used as a dimension. Defaults to `true` in Superset.
+                          type: boolean
+                        isActive:
+                          description: |-
+                            (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+                            Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
                           type: boolean
                         isDttm:
                           description: |-
@@ -900,10 +1024,15 @@ spec:
                           type: string
                       type: object
                     type: array
+                  currencyCodeColumn:
+                    description: |-
+                      (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                      Column holding the currency code of the rows, on Superset 6. Only sent when set.
+                    type: string
                   databaseName:
                     description: |-
-                      (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-                      Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+                      (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+                      Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
                     type: string
                   defaultEndpoint:
                     description: |-
@@ -914,6 +1043,11 @@ spec:
                     description: |-
                       text description of the dataset.
                       Free-text description of the dataset.
+                    type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
                     type: string
                   extra:
                     description: |-
@@ -933,6 +1067,18 @@ spec:
                   id:
                     description: (Number) Numeric identifier of the dataset.
                     type: string
+                  isManagedExternally:
+                    description: (Boolean) Whether the dataset is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dataset and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dataset and disables
+                      its editing in the UI. Defaults to `false`.
+                    type: boolean
+                  isSqllabView:
+                    description: |-
+                      (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+                      Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+                    type: boolean
                   mainDttmCol:
                     description: |-
                       (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
@@ -946,6 +1092,11 @@ spec:
                       deleted. (see below for nested schema)'
                     items:
                       properties:
+                        currency:
+                          description: |-
+                            (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+                            JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+                          type: string
                         d3format:
                           description: |-
                             (String) D3 format of the values, for example,.2f.
@@ -988,6 +1139,11 @@ spec:
                       (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
                       Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
                     type: boolean
+                  offset:
+                    description: |-
+                      (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+                      Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+                    type: number
                   owners:
                     description: |-
                       (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -1025,6 +1181,11 @@ spec:
                     description: |-
                       (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
                       JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
+                    type: string
+                  uuid:
+                    description: |-
+                      (String) UUID of the dataset, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
+                      UUID of the dataset, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
                     type: string
                 type: object
               conditions:

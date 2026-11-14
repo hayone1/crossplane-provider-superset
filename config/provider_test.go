@@ -43,8 +43,8 @@ func schemaResourceNames(t *testing.T) []string {
 // kind, a group, a framework resource and an existence check.
 func TestProviders_configureEveryResource(t *testing.T) {
 	names := schemaResourceNames(t)
-	if len(names) != 24 {
-		t.Fatalf("schema.json has %d resources, want 24", len(names))
+	if len(names) != 25 {
+		t.Fatalf("schema.json has %d resources, want 25", len(names))
 	}
 	for scope, pc := range map[string]*ujconfig.Provider{"cluster": GetProvider(), "namespaced": GetProviderNamespaced()} {
 		seenKinds := map[string]string{}
@@ -288,7 +288,8 @@ func TestDescriptionsUseCrossplaneTerms(t *testing.T) {
 			}
 		}
 		for field, text := range texts {
-			if strings.Contains(text, "destroy") {
+			// destroySql is the name of a field of SQLExecution.
+			if strings.Contains(strings.ReplaceAll(text, "destroySql", ""), "destroy") {
 				t.Errorf("%s %s says destroy: %s", name, field, text)
 			}
 			for _, f := range forbidden {

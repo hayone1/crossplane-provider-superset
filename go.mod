@@ -163,7 +163,8 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // indirect
 )
 
-// The provider embeds a build of terraform-provider-superset with fixes that are proposed
-// upstream: the branch crossplane-integration of the fork hayone1/terraform-provider-superset
-// (see docs/terraform-provider.md). Drop the replace once a release has the fixes.
-replace github.com/platacard/terraform-provider-superset => github.com/hayone1/terraform-provider-superset v1.0.1-0.20261110125633-e68d1dc4903c
+// The provider embeds the main branch of terraform-provider-superset with #90 (the public
+// provider package) on top: the branch pr/public-provider-package of the fork
+// hayone1/terraform-provider-superset (see docs/terraform-provider.md). Drop the replace once
+// #90 is merged.
+replace github.com/platacard/terraform-provider-superset => github.com/hayone1/terraform-provider-superset v1.0.1-0.20261113220435-199767d5f7ee

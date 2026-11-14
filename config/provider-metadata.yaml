@@ -98,7 +98,7 @@ resources:
         importStatements: []
     superset_chart:
         subCategory: ""
-        description: Manages a chart. Place a chart on a dashboard through the position_json of the dashboard.
+        description: Manages a chart. A chart is placed on a dashboard through the position_json of the dashboard, which lays it out, or through its own dashboards, which only links it.
         name: superset_chart
         title: superset_chart Resource - superset
         examples:
@@ -108,25 +108,45 @@ resources:
                   "cache_timeout": 300,
                   "datasource_id": "${superset_dataset.signups.id}",
                   "description": "Signups per day over the last month",
+                  "external_url": "https://git.example.com/analytics/blob/main/superset/charts.tf",
+                  "is_managed_externally": true,
                   "name": "Daily signups",
                   "params": "${jsonencode({\n    viz_type   = \"echarts_timeseries_line\"\n    x_axis     = \"day\"\n    metrics    = [\"count\"]\n    time_range = \"Last month\"\n  })}",
                   "viz_type": "echarts_timeseries_line"
                 }
               references:
                 datasource_id: superset_dataset.signups.id
+            - name: signups_total
+              manifest: |-
+                {
+                  "dashboards": [
+                    "${data.superset_dashboard.overview.id}"
+                  ],
+                  "datasource_id": "${superset_dataset.signups.id}",
+                  "name": "Signups total",
+                  "params": "${jsonencode({ viz_type = \"big_number_total\", metric = \"count\" })}",
+                  "viz_type": "big_number_total"
+                }
+              references:
+                dashboards: data.superset_dashboard.overview.id
+                datasource_id: superset_dataset.signups.id
         argumentDocs:
             cache_timeout: (Number) Duration in seconds for which the chart data is cached. Unset to use the timeout of the dataset or database.
             certification_details: (String) Details of the certification.
             certified_by: (String) Person or group that certified the chart.
+            dashboards: (Set of Number) Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the position_json of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
             datasource_id: (Number) Identifier of the dataset the chart is built on.
             datasource_type: '(String) Type of the datasource: table (a dataset, the default), query, saved_query or view.'
             description: (String) Free-text description of the chart.
+            external_url: (String) URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
             id: (Number) Numeric identifier of the chart.
+            is_managed_externally: (Boolean) Whether the chart is managed outside Superset, for example by Terraform. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to false.
             name: (String) Name of the chart.
             owners: (Set of Number) Identifiers of the users who own the chart. Defaults to the user the provider authenticates as.
             params: (String) JSON document with the form data of the chart, as shown in the chart's View query and Edit chart properties dialogs. Formatting differences are not reported as drift.
             query_context: (String) JSON document with the query context of the chart, which Superset uses for alerts, reports and cache warm-up. When unset, the query context Superset generates on its own is left alone.
             tags: (Set of String) Names of the tags attached to the chart, with the TAGGING_SYSTEM feature flag. When unset, the tags are left as they are; when set, the chart has exactly these tags. Tags that do not exist yet are created, and stay when the chart is destroyed.
+            uuid: (String) UUID of the chart, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
             viz_type: (String) Visualization type, for example table or echarts_timeseries_line.
         importStatements:
             - |-
@@ -186,6 +206,8 @@ resources:
             - name: signups
               manifest: |-
                 {
+                  "external_url": "https://git.example.com/analytics/blob/main/superset/dashboards.tf",
+                  "is_managed_externally": true,
                   "json_metadata": "${jsonencode({\n    refresh_frequency = 300\n    color_scheme      = \"supersetColors\"\n  })}",
                   "position_json": "${jsonencode({\n    DASHBOARD_VERSION_KEY = \"v2\"\n    ROOT_ID               = { type = \"ROOT\", id = \"ROOT_ID\", children = [\"GRID_ID\"] }\n    GRID_ID               = { type = \"GRID\", id = \"GRID_ID\", parents = [\"ROOT_ID\"], children = [\"ROW-1\"] }\n    \"ROW-1\" = {\n      type     = \"ROW\"\n      id       = \"ROW-1\"\n      parents  = [\"ROOT_ID\", \"GRID_ID\"]\n      children = [\"CHART-1\"]\n      meta     = { background = \"BACKGROUND_TRANSPARENT\" }\n    }\n    \"CHART-1\" = {\n      type     = \"CHART\"\n      id       = \"CHART-1\"\n      parents  = [\"ROOT_ID\", \"GRID_ID\", \"ROW-1\"]\n      children = []\n      meta     = { chartId = superset_chart.daily_signups.id, width = 6, height = 50 }\n    }\n  })}",
                   "published": true,
@@ -201,7 +223,9 @@ resources:
             certification_details: (String) Details of the certification.
             certified_by: (String) Person or group that certified the dashboard.
             css: (String) CSS applied to the dashboard.
+            external_url: (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
             id: (Number) Numeric identifier of the dashboard.
+            is_managed_externally: (Boolean) Whether the dashboard is managed outside Superset, for example by Terraform. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to false.
             json_metadata: '(String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.'
             owners: (Set of Number) Identifiers of the users who own the dashboard. Defaults to the user the provider authenticates as.
             position_json: (String) JSON document with the layout of the dashboard. The charts referenced by its CHART elements are linked to the dashboard. Superset adds the uuid of each chart to the layout, which is not reported as drift. When unset, the layout is left to Superset.
@@ -211,6 +235,7 @@ resources:
             tags: (Set of String) Names of the tags attached to the dashboard, with the TAGGING_SYSTEM feature flag. When unset, the tags are left as they are; when set, the dashboard has exactly these tags. Tags that do not exist yet are created, and stay when the dashboard is destroyed.
             theme_id: (Number) Identifier of the superset_theme the dashboard applies, on Superset 6. Unset, the dashboard uses the theme of the instance.
             title: (String) Title of the dashboard.
+            uuid: (String) UUID of the dashboard, the identifier used in export files and by the embedded SDK. Superset 3.1 does not return it, so it is null there.
         importStatements:
             - |-
               # Dashboards are imported by their numeric id.
@@ -334,10 +359,12 @@ resources:
             db_port: (Number) Port of the database server.
             db_user: (String) Username of the connection.
             expose_in_sqllab: (Boolean) Whether the connection is available in SQL Lab.
+            external_url: (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
             extra: '(String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.'
             force_ctas_schema: (String) Schema in which CREATE TABLE AS creates its tables when the query does not name one.
             id: (Number) Numeric identifier of the database connection.
             impersonate_user: (Boolean) Whether queries run as the logged-in user instead of the user of the connection. Defaults to false.
+            is_managed_externally: (Boolean) Whether the connection is managed outside Superset, for example by Terraform. Superset then shows a banner on the connection and disables its editing in the UI. Defaults to false.
             masked_encrypted_extra: (String, Sensitive) JSON document with the encrypted extra configuration of the connection, such as the credentials of BigQuery or Google Sheets. Superset masks it in its responses, so changes made in the UI are not detected.
             password: (String, Sensitive) Password of the user. Conflicts with private_key.
             private_key: (String, Sensitive) RSA private key of the user, in PEM format. Conflicts with password.
@@ -348,6 +375,7 @@ resources:
             sqlalchemy_uri: (String, Sensitive) Full SQLAlchemy URI of the connection, for engines whose URI does not fit the parts, for example awsathena+rest://... or trino://.... Conflicts with the parts. Changes made to the URI in the Superset UI are not detected, because Superset masks the password in the URI it returns.
             ssh_tunnel: (Attributes) SSH tunnel through which Superset reaches the database. Requires the SSH_TUNNELING feature flag in Superset. Superset authenticates with either password or private_key; the private key must be an RSA key. (see below for nested schema)
             username: (String) User on the SSH server.
+            uuid: (String) UUID of the connection, the identifier used in export files.
         importStatements:
             - |-
               # Database can be imported by specifying the numeric identifier of the Database id
@@ -413,6 +441,7 @@ resources:
                       "verbose_name": "Sales"
                     },
                     {
+                      "currency": "${jsonencode({ symbol = \"USD\", symbolPosition = \"prefix\" })}",
                       "d3format": ",.2f",
                       "expression": "SUM(amount)",
                       "metric_name": "revenue",
@@ -435,27 +464,36 @@ resources:
               references:
                 database_name: superset_database.warehouse.connection_name
         argumentDocs:
+            advanced_data_type: (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
             always_filter_main_dttm: (Boolean) Whether the time range of a chart is always applied to the main datetime column, even when the chart filters another one. Defaults to false.
             cache_timeout: (Number) Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
+            catalog: (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
             column_name: (String) Name of the column, unique within the dataset.
             columns: (Attributes Set) Columns of the dataset. When unset, the columns are left to Superset, which detects them from the source. When set, the dataset has exactly these columns, and columns not listed here are deleted. Within a column, only the attributes that are set are written, so the others keep the value Superset has, such as the detected type; an empty string clears an attribute. (see below for nested schema)
+            currency: '(String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.'
+            currency_code_column: (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
             d3format: (String) D3 format of the values, for example ,.2f.
-            database_name: (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+            database_name: (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
             default_endpoint: (String) URL Superset redirects to when the dataset is opened.
             description: (String) Free-text description of the dataset.
             expression: (String) SQL expression of a calculated column, for example amount * 100.
+            external_url: (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
             extra: (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
             fetch_values_predicate: (String) SQL predicate applied when Superset fetches the distinct values of a column for a filter.
             filter_select_enabled: (Boolean) Whether filters of the dataset offer the distinct values of a column. Defaults to true.
             filterable: (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
             groupby: (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
             id: (Number) Numeric identifier of the dataset.
+            is_active: (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
             is_dttm: (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
+            is_managed_externally: (Boolean) Whether the dataset is managed outside Superset, for example by Terraform. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to false.
+            is_sqllab_view: (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
             main_dttm_col: (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
             metric_name: (String) Name of the metric, unique within the dataset.
             metric_type: (String) Type of the aggregate, for example sum or count; informational.
             metrics: '(Attributes Set) Metrics of the dataset. When unset, the metrics are left to Superset, which creates count with every dataset. When set, the dataset has exactly these metrics: declare count too if it should stay, and metrics not listed here are deleted. (see below for nested schema)'
             normalize_columns: (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
+            offset: (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
             owners: (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
             perm: (String) View menu of the datasource_access permission of the dataset, [<database>].[<table>](id:<id>), for superset_role_permissions.
             python_date_format: (String) Format of the values of a datetime column stored as text, for example %Y-%m-%d, or epoch_s.
@@ -465,6 +503,7 @@ resources:
             table_name: (String) Name of the table, or name of the virtual dataset.
             template_params: (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
             type: (String) Data type of the column, for example NUMERIC. Superset detects it for the columns of the source; set it for a calculated column.
+            uuid: (String) UUID of the dataset, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
             verbose_name: (String) Label shown instead of the name.
             warning_text: (String) Warning shown next to the metric.
         importStatements:
@@ -562,7 +601,7 @@ resources:
             label: (String) Label shown instead of the name.
             name: (String) Name of the group, unique in Superset.
             roles: (Set of Number) Identifiers of the roles the members of the group get, for example from superset_role.
-            users: (Set of Number) Identifiers of the members of the group, for example from superset_user.
+            users: (Set of Number) Identifiers of the members of the group, for example from superset_user. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in superset_user.
         importStatements: []
     superset_meta_database:
         subCategory: ""
@@ -823,6 +862,43 @@ resources:
             - |-
               # A saved query is imported by its numeric id.
               terraform import superset_saved_query.daily_signups 9
+    superset_sql_execution:
+        subCategory: ""
+        description: Runs a SQL statement through SQL Lab on a database connection, for example to create a view or a table that a dataset is then built on. The statement runs when the resource is created and again whenever triggers change; a change of the statement, the connection, the schema or the catalog replaces the resource, which runs destroy_sql first when it is set. The connection must be exposed in SQL Lab (expose_in_sqllab) and allow DML (allow_dml) for a statement that changes data or structure. Several statements separated by ; run in order; the rows a statement returns are discarded.
+        name: superset_sql_execution
+        title: superset_sql_execution Resource - superset
+        examples:
+            - name: daily_sales
+              manifest: |-
+                {
+                  "database_name": "Warehouse",
+                  "destroy_sql": "DROP VIEW IF EXISTS daily_sales",
+                  "schema": "public",
+                  "sql": "CREATE OR REPLACE VIEW daily_sales AS SELECT day, sum(amount) AS amount FROM sales GROUP BY day",
+                  "triggers": {
+                    "version": "1"
+                  }
+                }
+              dependencies:
+                superset_dataset.daily_sales: |-
+                    {
+                      "database_name": "Warehouse",
+                      "depends_on": [
+                        "${superset_sql_execution.daily_sales}"
+                      ],
+                      "schema": "public",
+                      "table_name": "daily_sales"
+                    }
+        argumentDocs:
+            catalog: (String) Catalog to run in, on Superset 6 connections with several catalogs. Left to the default of the connection when unset.
+            database_id: (Number) Numeric identifier of the connection, looked up from database_name when that is set.
+            database_name: (String) Name of the database connection to run on. Exactly one of database_name and database_id must be set.
+            destroy_sql: (String) Statement run when the resource is destroyed or replaced, for example DROP VIEW IF EXISTS daily_sales. Nothing runs when unset, and nothing runs when the connection no longer exists.
+            id: (Number) Identifier of the last run in the query history of SQL Lab.
+            schema: (String) Schema the unqualified names of the statement are resolved in.
+            sql: (String) The statement to run.
+            triggers: (Map of String) Arbitrary values whose change runs the statement again, for example a version.
+        importStatements: []
     superset_tag:
         subCategory: ""
         description: Manages a tag, a label attached to charts, dashboards and saved queries with the TAGGING_SYSTEM feature flag. The objects a tag is attached to are managed by the tags of superset_chart and superset_dashboard; the tag keeps them when it is renamed, and is detached from them when it is destroyed.
@@ -911,10 +987,44 @@ resources:
                   ],
                   "username": "example.user"
                 }
+              dependencies:
+                superset_group.analysts: |-
+                    {
+                      "name": "analysts",
+                      "roles": [
+                        4
+                      ]
+                    }
+            - name: analyst
+              manifest: |-
+                {
+                  "email": "analyst.sample@example.com",
+                  "first_name": "Analyst",
+                  "groups": [
+                    "${superset_group.analysts.id}"
+                  ],
+                  "last_name": "Sample",
+                  "password": "AnalystSamplePass123!",
+                  "roles": [
+                    4
+                  ],
+                  "username": "analyst.user"
+                }
+              references:
+                groups: superset_group.analysts.id
+              dependencies:
+                superset_group.analysts: |-
+                    {
+                      "name": "analysts",
+                      "roles": [
+                        4
+                      ]
+                    }
         argumentDocs:
             active: (Boolean) Whether the user is active. Defaults to true.
             email: (String) Email address of the user.
             first_name: (String) First name of the user.
+            groups: (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from superset_group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in superset_group. Null on older versions of Superset, which have no groups and reject the attribute.
             id: (Number) Numeric identifier of the user.
             last_name: (String) Last name of the user.
             last_updated: (String) Timestamp of the last update.

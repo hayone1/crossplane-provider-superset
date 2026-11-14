@@ -8,3 +8,6 @@ package v1alpha1
 
 // Hub marks this type as a conversion hub.
 func (tr *SavedQuery) Hub() {}
+
+// Hub marks this type as a conversion hub.
+func (tr *SQLExecution) Hub() {}

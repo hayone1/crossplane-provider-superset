@@ -75,8 +75,8 @@ The `crossplane.io/external-name` annotation must be the number of the object in
 
 ### "diff contains fields that require resource replacement"
 
-You changed a field that Superset cannot change on an existing object, such as the `databaseName`
-of a Dataset. The provider does not delete and recreate the object for you. Delete the managed
+You changed a field that Superset cannot change on an existing object, such as the `username` of
+a User. The provider does not delete and recreate the object for you. Delete the managed
 resource and create it again, or change the field back.
 
 ### HTTP 403 from Superset

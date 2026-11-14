@@ -306,6 +306,26 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 	var mrsp reference.MultiNamespacedResolutionResponse
 	var err error
 	{
+		m, l, err = apisresolver.GetManagedResource("security.superset.m.crossplane.io", "v1alpha1", "Group", "GroupList")
+		if err != nil {
+			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
+		}
+
+		mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+			CurrentValues: reference.FromFloatPtrValues(mg.Spec.ForProvider.Groups),
+			Extract:       reference.ExternalName(),
+			Namespace:     mg.GetNamespace(),
+			References:    mg.Spec.ForProvider.GroupsRefs,
+			Selector:      mg.Spec.ForProvider.GroupsSelector,
+			To:            reference.To{List: l, Managed: m},
+		})
+	}
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.ForProvider.Groups")
+	}
+	mg.Spec.ForProvider.Groups = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.ForProvider.GroupsRefs = mrsp.ResolvedReferences
+	{
 		m, l, err = apisresolver.GetManagedResource("security.superset.m.crossplane.io", "v1alpha1", "Role", "RoleList")
 		if err != nil {
 			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
@@ -325,6 +345,26 @@ func (mg *User) ResolveReferences(ctx context.Context, c client.Reader) error {
 	}
 	mg.Spec.ForProvider.Roles = reference.ToFloatPtrValues(mrsp.ResolvedValues)
 	mg.Spec.ForProvider.RolesRefs = mrsp.ResolvedReferences
+	{
+		m, l, err = apisresolver.GetManagedResource("security.superset.m.crossplane.io", "v1alpha1", "Group", "GroupList")
+		if err != nil {
+			return errors.Wrap(err, "failed to get the reference target managed resource and its list for reference resolution")
+		}
+
+		mrsp, err = r.ResolveMultiple(ctx, reference.MultiNamespacedResolutionRequest{
+			CurrentValues: reference.FromFloatPtrValues(mg.Spec.InitProvider.Groups),
+			Extract:       reference.ExternalName(),
+			Namespace:     mg.GetNamespace(),
+			References:    mg.Spec.InitProvider.GroupsRefs,
+			Selector:      mg.Spec.InitProvider.GroupsSelector,
+			To:            reference.To{List: l, Managed: m},
+		})
+	}
+	if err != nil {
+		return errors.Wrap(err, "mg.Spec.InitProvider.Groups")
+	}
+	mg.Spec.InitProvider.Groups = reference.ToFloatPtrValues(mrsp.ResolvedValues)
+	mg.Spec.InitProvider.GroupsRefs = mrsp.ResolvedReferences
 	{
 		m, l, err = apisresolver.GetManagedResource("security.superset.m.crossplane.io", "v1alpha1", "Role", "RoleList")
 		if err != nil {

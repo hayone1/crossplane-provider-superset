@@ -34,6 +34,7 @@ import (
 //
 //   - DashboardEmbedding, DatasetRefresh and DatabasePermissionsSync use the ID of their
 //     dashboard, dataset or database.
+//   - SQLExecution uses the ID of its last run in the query history of SQL Lab.
 //   - RolePermissions uses the ID of its role (a string), and manages the permissions of
 //     the role that roleName names.
 //   - The import kinds (assets group) have no ID: an import is an action, not an object. Their
@@ -59,6 +60,7 @@ var numericIDNames = []string{
 	"superset_role_permissions",
 	"superset_row_level_security",
 	"superset_saved_query",
+	"superset_sql_execution",
 	"superset_tag",
 	"superset_theme",
 	"superset_user",

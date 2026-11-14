@@ -15,6 +15,10 @@ import (
 
 type ColumnsInitParameters struct {
 
+	// (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+	// Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+	AdvancedDataType *string `json:"advancedDataType,omitempty" tf:"advanced_data_type,omitempty"`
+
 	// (String) Name of the column, unique within the dataset.
 	// Name of the column, unique within the dataset.
 	ColumnName *string `json:"columnName,omitempty" tf:"column_name,omitempty"`
@@ -27,6 +31,10 @@ type ColumnsInitParameters struct {
 	// SQL expression of a calculated column, for example `amount * 100`.
 	Expression *string `json:"expression,omitempty" tf:"expression,omitempty"`
 
+	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+	// JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
+
 	// (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
 	// Whether the column can be used in a filter. Defaults to `true` in Superset.
 	Filterable *bool `json:"filterable,omitempty" tf:"filterable,omitempty"`
@@ -34,6 +42,10 @@ type ColumnsInitParameters struct {
 	// (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
 	// Whether the column can be used as a dimension. Defaults to `true` in Superset.
 	Groupby *bool `json:"groupby,omitempty" tf:"groupby,omitempty"`
+
+	// (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+	// Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
+	IsActive *bool `json:"isActive,omitempty" tf:"is_active,omitempty"`
 
 	// (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
 	// Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
@@ -54,6 +66,10 @@ type ColumnsInitParameters struct {
 
 type ColumnsObservation struct {
 
+	// (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+	// Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+	AdvancedDataType *string `json:"advancedDataType,omitempty" tf:"advanced_data_type,omitempty"`
+
 	// (String) Name of the column, unique within the dataset.
 	// Name of the column, unique within the dataset.
 	ColumnName *string `json:"columnName,omitempty" tf:"column_name,omitempty"`
@@ -66,6 +82,10 @@ type ColumnsObservation struct {
 	// SQL expression of a calculated column, for example `amount * 100`.
 	Expression *string `json:"expression,omitempty" tf:"expression,omitempty"`
 
+	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+	// JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
+
 	// (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
 	// Whether the column can be used in a filter. Defaults to `true` in Superset.
 	Filterable *bool `json:"filterable,omitempty" tf:"filterable,omitempty"`
@@ -73,6 +93,10 @@ type ColumnsObservation struct {
 	// (Boolean) Whether the column can be used as a dimension. Defaults to true in Superset.
 	// Whether the column can be used as a dimension. Defaults to `true` in Superset.
 	Groupby *bool `json:"groupby,omitempty" tf:"groupby,omitempty"`
+
+	// (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+	// Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
+	IsActive *bool `json:"isActive,omitempty" tf:"is_active,omitempty"`
 
 	// (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
 	// Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
@@ -93,6 +117,11 @@ type ColumnsObservation struct {
 
 type ColumnsParameters struct {
 
+	// (String) Advanced data type of the column, for example internet_address or port, for the advanced data type filters.
+	// Advanced data type of the column, for example `internet_address` or `port`, for the advanced data type filters.
+	// +kubebuilder:validation:Optional
+	AdvancedDataType *string `json:"advancedDataType,omitempty" tf:"advanced_data_type,omitempty"`
+
 	// (String) Name of the column, unique within the dataset.
 	// Name of the column, unique within the dataset.
 	// +kubebuilder:validation:Optional
@@ -108,6 +137,11 @@ type ColumnsParameters struct {
 	// +kubebuilder:validation:Optional
 	Expression *string `json:"expression,omitempty" tf:"expression,omitempty"`
 
+	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
+	// JSON document with extra settings of the column, such as `warning_markdown` or `certification`. Formatting differences are not reported as drift.
+	// +kubebuilder:validation:Optional
+	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
+
 	// (Boolean) Whether the column can be used in a filter. Defaults to true in Superset.
 	// Whether the column can be used in a filter. Defaults to `true` in Superset.
 	// +kubebuilder:validation:Optional
@@ -117,6 +151,11 @@ type ColumnsParameters struct {
 	// Whether the column can be used as a dimension. Defaults to `true` in Superset.
 	// +kubebuilder:validation:Optional
 	Groupby *bool `json:"groupby,omitempty" tf:"groupby,omitempty"`
+
+	// (Boolean) Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to true in Superset.
+	// Whether the column is active. Superset keeps an inactive column but hides it from the charts. Defaults to `true` in Superset.
+	// +kubebuilder:validation:Optional
+	IsActive *bool `json:"isActive,omitempty" tf:"is_active,omitempty"`
 
 	// (Boolean) Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
 	// Whether the column is a datetime column, which can be used as the time column of a chart. Superset detects it for the columns of the source.
@@ -149,11 +188,19 @@ type DatasetInitParameters struct {
 	// Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
 	CacheTimeout *float64 `json:"cacheTimeout,omitempty" tf:"cache_timeout,omitempty"`
 
+	// (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	// Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	Catalog *string `json:"catalog,omitempty" tf:"catalog,omitempty"`
+
 	// (Attributes Set) Columns of the dataset. When unset, the columns are left to Superset, which detects them from the source. When set, the dataset has exactly these columns, and columns not listed here are deleted. Within a column, only the attributes that are set are written, so the others keep the value Superset has, such as the detected type; an empty string clears an attribute. (see below for nested schema)
 	Columns []ColumnsInitParameters `json:"columns,omitempty" tf:"columns,omitempty"`
 
-	// (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-	// Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+	// (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	// Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	CurrencyCodeColumn *string `json:"currencyCodeColumn,omitempty" tf:"currency_code_column,omitempty"`
+
+	// (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+	// Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
 	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/cluster/database/v1alpha1.Database
 	// +crossplane:generate:reference:extractor=github.com/crossplane/upjet/v2/pkg/resource.ExtractParamPath("connection_name", true)
 	DatabaseName *string `json:"databaseName,omitempty" tf:"database_name,omitempty"`
@@ -174,6 +221,10 @@ type DatasetInitParameters struct {
 	// Free-text description of the dataset.
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
 
+	// (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
 	// JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
 	Extra *string `json:"extra,omitempty" tf:"extra,omitempty"`
@@ -186,6 +237,13 @@ type DatasetInitParameters struct {
 	// Whether filters of the dataset offer the distinct values of a column. Defaults to `true`.
 	FilterSelectEnabled *bool `json:"filterSelectEnabled,omitempty" tf:"filter_select_enabled,omitempty"`
 
+	// (Boolean) Whether the dataset is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
+
+	// (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+	// Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+	IsSqllabView *bool `json:"isSqllabView,omitempty" tf:"is_sqllab_view,omitempty"`
+
 	// (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	// Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	MainDttmCol *string `json:"mainDttmCol,omitempty" tf:"main_dttm_col,omitempty"`
@@ -196,6 +254,10 @@ type DatasetInitParameters struct {
 	// (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
 	// Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
 	NormalizeColumns *bool `json:"normalizeColumns,omitempty" tf:"normalize_columns,omitempty"`
+
+	// (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+	// Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+	Offset *float64 `json:"offset,omitempty" tf:"offset,omitempty"`
 
 	// (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
 	// Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -238,11 +300,19 @@ type DatasetObservation struct {
 	// Duration in seconds for which the charts of the dataset are cached. Unset to use the timeout of the database.
 	CacheTimeout *float64 `json:"cacheTimeout,omitempty" tf:"cache_timeout,omitempty"`
 
+	// (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	// Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	Catalog *string `json:"catalog,omitempty" tf:"catalog,omitempty"`
+
 	// (Attributes Set) Columns of the dataset. When unset, the columns are left to Superset, which detects them from the source. When set, the dataset has exactly these columns, and columns not listed here are deleted. Within a column, only the attributes that are set are written, so the others keep the value Superset has, such as the detected type; an empty string clears an attribute. (see below for nested schema)
 	Columns []ColumnsObservation `json:"columns,omitempty" tf:"columns,omitempty"`
 
-	// (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-	// Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+	// (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	// Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	CurrencyCodeColumn *string `json:"currencyCodeColumn,omitempty" tf:"currency_code_column,omitempty"`
+
+	// (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+	// Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
 	DatabaseName *string `json:"databaseName,omitempty" tf:"database_name,omitempty"`
 
 	// (String) URL Superset redirects to when the dataset is opened.
@@ -252,6 +322,10 @@ type DatasetObservation struct {
 	// text description of the dataset.
 	// Free-text description of the dataset.
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
+
+	// (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
 
 	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
 	// JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
@@ -268,6 +342,13 @@ type DatasetObservation struct {
 	// (Number) Numeric identifier of the dataset.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
+	// (Boolean) Whether the dataset is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
+
+	// (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+	// Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+	IsSqllabView *bool `json:"isSqllabView,omitempty" tf:"is_sqllab_view,omitempty"`
+
 	// (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	// Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	MainDttmCol *string `json:"mainDttmCol,omitempty" tf:"main_dttm_col,omitempty"`
@@ -278,6 +359,10 @@ type DatasetObservation struct {
 	// (Boolean) Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to false.
 	// Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
 	NormalizeColumns *bool `json:"normalizeColumns,omitempty" tf:"normalize_columns,omitempty"`
+
+	// (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+	// Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+	Offset *float64 `json:"offset,omitempty" tf:"offset,omitempty"`
 
 	// (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
 	// Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -307,6 +392,10 @@ type DatasetObservation struct {
 	// (String) JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
 	// JSON object with the default values of the Jinja template parameters of the SQL query. Recent versions of Superset apply them when the dataset is created; Superset 3.1 only after.
 	TemplateParams *string `json:"templateParams,omitempty" tf:"template_params,omitempty"`
+
+	// (String) UUID of the dataset, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
+	// UUID of the dataset, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
+	UUID *string `json:"uuid,omitempty" tf:"uuid,omitempty"`
 }
 
 type DatasetParameters struct {
@@ -321,12 +410,22 @@ type DatasetParameters struct {
 	// +kubebuilder:validation:Optional
 	CacheTimeout *float64 `json:"cacheTimeout,omitempty" tf:"cache_timeout,omitempty"`
 
+	// (String) Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	// Catalog of the table, on Superset 6. When unset, the catalog is left to Superset, which fills in the default catalog of the connection on its own; Superset only accepts another catalog on a connection whose catalogs are enabled. Only sent when set, so older versions of Superset, which reject the field, are not affected.
+	// +kubebuilder:validation:Optional
+	Catalog *string `json:"catalog,omitempty" tf:"catalog,omitempty"`
+
 	// (Attributes Set) Columns of the dataset. When unset, the columns are left to Superset, which detects them from the source. When set, the dataset has exactly these columns, and columns not listed here are deleted. Within a column, only the attributes that are set are written, so the others keep the value Superset has, such as the detected type; an empty string clears an attribute. (see below for nested schema)
 	// +kubebuilder:validation:Optional
 	Columns []ColumnsParameters `json:"columns,omitempty" tf:"columns,omitempty"`
 
-	// (String) Name of the database connection the dataset belongs to. Changing it replaces the dataset.
-	// Name of the database connection the dataset belongs to. Changing it replaces the dataset.
+	// (String) Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	// Column holding the currency code of the rows, on Superset 6. Only sent when set.
+	// +kubebuilder:validation:Optional
+	CurrencyCodeColumn *string `json:"currencyCodeColumn,omitempty" tf:"currency_code_column,omitempty"`
+
+	// (String) Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
+	// Name of the database connection the dataset belongs to. Changing it moves the dataset to that connection; the dataset keeps its id and its charts.
 	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/cluster/database/v1alpha1.Database
 	// +crossplane:generate:reference:extractor=github.com/crossplane/upjet/v2/pkg/resource.ExtractParamPath("connection_name", true)
 	// +kubebuilder:validation:Optional
@@ -350,6 +449,11 @@ type DatasetParameters struct {
 	// +kubebuilder:validation:Optional
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
 
+	// (String) URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dataset is managed, shown as a link in the banner of a dataset that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// +kubebuilder:validation:Optional
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (String) JSON document with extra settings of the dataset, such as certification or warning_markdown.
 	// JSON document with extra settings of the dataset, such as `certification` or `warning_markdown`.
 	// +kubebuilder:validation:Optional
@@ -365,6 +469,15 @@ type DatasetParameters struct {
 	// +kubebuilder:validation:Optional
 	FilterSelectEnabled *bool `json:"filterSelectEnabled,omitempty" tf:"filter_select_enabled,omitempty"`
 
+	// (Boolean) Whether the dataset is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dataset and disables its editing in the UI. Defaults to `false`.
+	// +kubebuilder:validation:Optional
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
+
+	// (Boolean) Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to false.
+	// Whether the dataset was saved from a SQL Lab query, which hides it from the dataset list of the UI. Defaults to `false`.
+	// +kubebuilder:validation:Optional
+	IsSqllabView *bool `json:"isSqllabView,omitempty" tf:"is_sqllab_view,omitempty"`
+
 	// (String) Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	// Column used as the default time column of the dataset. Superset picks the first datetime column when unset.
 	// +kubebuilder:validation:Optional
@@ -378,6 +491,11 @@ type DatasetParameters struct {
 	// Whether the names of the columns are normalized to lower case when they are fetched from the source. Defaults to `false`.
 	// +kubebuilder:validation:Optional
 	NormalizeColumns *bool `json:"normalizeColumns,omitempty" tf:"normalize_columns,omitempty"`
+
+	// (Number) Hours added to the timestamps of the dataset to shift its timezone. Defaults to 0.
+	// Hours added to the timestamps of the dataset to shift its timezone. Defaults to `0`.
+	// +kubebuilder:validation:Optional
+	Offset *float64 `json:"offset,omitempty" tf:"offset,omitempty"`
 
 	// (Set of Number) Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
 	// Identifiers of the users who own the dataset. Defaults to the user the provider authenticates as.
@@ -417,6 +535,10 @@ type DatasetParameters struct {
 
 type MetricsInitParameters struct {
 
+	// (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+	// JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+	Currency *string `json:"currency,omitempty" tf:"currency,omitempty"`
+
 	// (String) D3 format of the values, for example,.2f.
 	// D3 format of the values, for example `,.2f`.
 	D3Format *string `json:"d3format,omitempty" tf:"d3format,omitempty"`
@@ -448,6 +570,10 @@ type MetricsInitParameters struct {
 
 type MetricsObservation struct {
 
+	// (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+	// JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+	Currency *string `json:"currency,omitempty" tf:"currency,omitempty"`
+
 	// (String) D3 format of the values, for example,.2f.
 	// D3 format of the values, for example `,.2f`.
 	D3Format *string `json:"d3format,omitempty" tf:"d3format,omitempty"`
@@ -478,6 +604,11 @@ type MetricsObservation struct {
 }
 
 type MetricsParameters struct {
+
+	// (String) JSON object with the currency of the metric: symbol, an ISO code such as USD, and symbolPosition, prefix or suffix. Formatting differences are not reported as drift.
+	// JSON object with the currency of the metric: `symbol`, an ISO code such as `USD`, and `symbolPosition`, `prefix` or `suffix`. Formatting differences are not reported as drift.
+	// +kubebuilder:validation:Optional
+	Currency *string `json:"currency,omitempty" tf:"currency,omitempty"`
 
 	// (String) D3 format of the values, for example,.2f.
 	// D3 format of the values, for example `,.2f`.

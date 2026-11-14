@@ -1,6 +1,6 @@
 # Managed resources
 
-The provider for Apache Superset has 24 kinds. Each kind exists in two API variants:
+The provider for Apache Superset has 25 kinds. Each kind exists in two API variants:
 
 * cluster-scoped, in the group `<group>.superset.crossplane.io`, and
 * namespaced, in the group `<group>.superset.m.crossplane.io`.
@@ -40,6 +40,7 @@ that exists already, create the managed resource with this annotation (see
 | `CSSTemplate` | `dashboard` | `superset_css_template` | The template's ID | |
 | `Theme` | `theme` | `superset_theme` | The theme's ID | Superset 6. |
 | `SavedQuery` | `sqllab` | `superset_saved_query` | The query's ID | |
+| `SQLExecution` | `sqllab` | `superset_sql_execution` | The ID of its last run in the query history | An action: runs a SQL statement, and again when `triggers` changes. See [SQL statements](behaviour.md#sql-statements). |
 | `AnnotationLayer` | `annotation` | `superset_annotation_layer` | The layer's ID | |
 | `Annotation` | `annotation` | `superset_annotation` | The annotation's ID | |
 | `Tag` | `tag` | `superset_tag` | The tag's ID | Needs the feature flag `TAGGING_SYSTEM`. |
@@ -64,7 +65,7 @@ managed resource waits and reports that the reference is not ready.
 |------|-------|-----------|-------|
 | `RolePermissions` | `roleName` | `Role` | The role's name |
 | `RolePermissions` | `resourcePermissions[].viewMenu` | `Dataset` | The `perm` of the dataset, such as `[Warehouse].[sales](id:12)`. Superset calls the object of a permission a view menu. |
-| `User` | `roles` | `Role` | The role IDs |
+| `User` | `roles`, `groups` | `Role`, `Group` | The IDs |
 | `Group` | `roles`, `users` | `Role`, `User` | The IDs |
 | `RowLevelSecurity` | `roles`, `tables` | `Role`, `Dataset` | The IDs |
 | `MetaDatabase` | `allowedDatabases` | `Database` | The connection names |
@@ -73,10 +74,12 @@ managed resource waits and reports that the reference is not ready.
 | `Dataset` | `owners` | `User` | The IDs |
 | `DatasetRefresh` | `datasetId` | `Dataset` | The ID |
 | `Chart` | `datasourceId` | `Dataset` | The ID |
-| `Chart` | `owners`, `tags` | `User`, `Tag` | The user IDs, the tag names |
+| `Chart` | `dashboards`, `owners`, `tags` | `Dashboard`, `User`, `Tag` | The dashboard and user IDs, the tag names |
 | `Dashboard` | `owners`, `roles`, `themeId`, `tags` | `User`, `Role`, `Theme`, `Tag` | The IDs, the tag names |
 | `DashboardEmbedding` | `dashboardId` | `Dashboard` | The ID |
 | `SavedQuery` | `databaseId` | `Database` | The ID |
+| `SQLExecution` | `databaseId` | `Database` | The ID |
+| `SQLExecution` | `databaseName` | `Database` | The connection name |
 | `Annotation` | `layerId` | `AnnotationLayer` | The ID |
 | `Report` | `chartId`, `dashboardId`, `owners` | `Chart`, `Dashboard`, `User` | The IDs |
 | `Report` | `databaseName` | `Database` | The connection name |

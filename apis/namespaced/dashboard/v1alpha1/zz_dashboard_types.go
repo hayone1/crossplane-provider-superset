@@ -27,6 +27,13 @@ type DashboardInitParameters struct {
 	// Person or group that certified the dashboard.
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
 
+	// (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
+	// (Boolean) Whether the dashboard is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
+
 	// (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
 	// JSON document with the settings of the dashboard, such as `refresh_frequency`, `color_scheme` or `native_filter_configuration`. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
 	JSONMetadata *string `json:"jsonMetadata,omitempty" tf:"json_metadata,omitempty"`
@@ -118,8 +125,15 @@ type DashboardObservation struct {
 	// Person or group that certified the dashboard.
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
 
+	// (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (Number) Numeric identifier of the dashboard.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
+
+	// (Boolean) Whether the dashboard is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
 	// JSON document with the settings of the dashboard, such as `refresh_frequency`, `color_scheme` or `native_filter_configuration`. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
@@ -159,6 +173,10 @@ type DashboardObservation struct {
 	// (String) Title of the dashboard.
 	// Title of the dashboard.
 	Title *string `json:"title,omitempty" tf:"title,omitempty"`
+
+	// (String) UUID of the dashboard, the identifier used in export files and by the embedded SDK. Superset 3.1 does not return it, so it is null there.
+	// UUID of the dashboard, the identifier used in export files and by the embedded SDK. Superset 3.1 does not return it, so it is null there.
+	UUID *string `json:"uuid,omitempty" tf:"uuid,omitempty"`
 }
 
 type DashboardParameters struct {
@@ -177,6 +195,15 @@ type DashboardParameters struct {
 	// Person or group that certified the dashboard.
 	// +kubebuilder:validation:Optional
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
+
+	// (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// +kubebuilder:validation:Optional
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
+	// (Boolean) Whether the dashboard is managed outside Superset, for example by Crossplane. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to false. Superset then shows a banner on the dashboard and disables its editing in the UI. Defaults to `false`.
+	// +kubebuilder:validation:Optional
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
 	// JSON document with the settings of the dashboard, such as `refresh_frequency`, `color_scheme` or `native_filter_configuration`. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.

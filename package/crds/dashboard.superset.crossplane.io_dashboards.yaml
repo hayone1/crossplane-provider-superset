@@ -90,6 +90,18 @@ spec:
                       (String) CSS applied to the dashboard.
                       CSS applied to the dashboard.
                     type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
+                  isManagedExternally:
+                    description: (Boolean) Whether the dashboard is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dashboard and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dashboard and
+                      disables its editing in the UI. Defaults to `false`.
+                    type: boolean
                   jsonMetadata:
                     description: |-
                       (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
@@ -480,6 +492,18 @@ spec:
                       (String) CSS applied to the dashboard.
                       CSS applied to the dashboard.
                     type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
+                  isManagedExternally:
+                    description: (Boolean) Whether the dashboard is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dashboard and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dashboard and
+                      disables its editing in the UI. Defaults to `false`.
+                    type: boolean
                   jsonMetadata:
                     description: |-
                       (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
@@ -953,9 +977,21 @@ spec:
                       (String) CSS applied to the dashboard.
                       CSS applied to the dashboard.
                     type: string
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the dashboard is managed, shown as a link in the banner of a dashboard that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   id:
                     description: (Number) Numeric identifier of the dashboard.
                     type: string
+                  isManagedExternally:
+                    description: (Boolean) Whether the dashboard is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the dashboard and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the dashboard and
+                      disables its editing in the UI. Defaults to `false`.
+                    type: boolean
                   jsonMetadata:
                     description: |-
                       (String) JSON document with the settings of the dashboard, such as refresh_frequency, color_scheme or native_filter_configuration. Only the keys set here are managed: keys Superset adds or that are changed in the UI keep their value and are not reported as drift. When unset, the settings are left to Superset.
@@ -1009,6 +1045,11 @@ spec:
                     description: |-
                       (String) Title of the dashboard.
                       Title of the dashboard.
+                    type: string
+                  uuid:
+                    description: |-
+                      (String) UUID of the dashboard, the identifier used in export files and by the embedded SDK. Superset 3.1 does not return it, so it is null there.
+                      UUID of the dashboard, the identifier used in export files and by the embedded SDK. Superset 3.1 does not return it, so it is null there.
                     type: string
                 type: object
               conditions:

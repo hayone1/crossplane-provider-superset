@@ -58,6 +58,29 @@ func (in *ChartInitParameters) DeepCopyInto(out *ChartInitParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Dashboards != nil {
+		in, out := &in.Dashboards, &out.Dashboards
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
+	if in.DashboardsRefs != nil {
+		in, out := &in.DashboardsRefs, &out.DashboardsRefs
+		*out = make([]v2.NamespacedReference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.DashboardsSelector != nil {
+		in, out := &in.DashboardsSelector, &out.DashboardsSelector
+		*out = new(v2.NamespacedSelector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.DatasourceID != nil {
 		in, out := &in.DatasourceID, &out.DatasourceID
 		*out = new(float64)
@@ -81,6 +104,16 @@ func (in *ChartInitParameters) DeepCopyInto(out *ChartInitParameters) {
 	if in.Description != nil {
 		in, out := &in.Description, &out.Description
 		*out = new(string)
+		**out = **in
+	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
+		*out = new(bool)
 		**out = **in
 	}
 	if in.Name != nil {
@@ -211,6 +244,17 @@ func (in *ChartObservation) DeepCopyInto(out *ChartObservation) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Dashboards != nil {
+		in, out := &in.Dashboards, &out.Dashboards
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
 	if in.DatasourceID != nil {
 		in, out := &in.DatasourceID, &out.DatasourceID
 		*out = new(float64)
@@ -226,9 +270,19 @@ func (in *ChartObservation) DeepCopyInto(out *ChartObservation) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
 	if in.ID != nil {
 		in, out := &in.ID, &out.ID
 		*out = new(string)
+		**out = **in
+	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
+		*out = new(bool)
 		**out = **in
 	}
 	if in.Name != nil {
@@ -268,6 +322,11 @@ func (in *ChartObservation) DeepCopyInto(out *ChartObservation) {
 			}
 		}
 	}
+	if in.UUID != nil {
+		in, out := &in.UUID, &out.UUID
+		*out = new(string)
+		**out = **in
+	}
 	if in.VizType != nil {
 		in, out := &in.VizType, &out.VizType
 		*out = new(string)
@@ -303,6 +362,29 @@ func (in *ChartParameters) DeepCopyInto(out *ChartParameters) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Dashboards != nil {
+		in, out := &in.Dashboards, &out.Dashboards
+		*out = make([]*float64, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(float64)
+				**out = **in
+			}
+		}
+	}
+	if in.DashboardsRefs != nil {
+		in, out := &in.DashboardsRefs, &out.DashboardsRefs
+		*out = make([]v2.NamespacedReference, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
+	}
+	if in.DashboardsSelector != nil {
+		in, out := &in.DashboardsSelector, &out.DashboardsSelector
+		*out = new(v2.NamespacedSelector)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.DatasourceID != nil {
 		in, out := &in.DatasourceID, &out.DatasourceID
 		*out = new(float64)
@@ -326,6 +408,16 @@ func (in *ChartParameters) DeepCopyInto(out *ChartParameters) {
 	if in.Description != nil {
 		in, out := &in.Description, &out.Description
 		*out = new(string)
+		**out = **in
+	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
+		*out = new(bool)
 		**out = **in
 	}
 	if in.Name != nil {

@@ -41,8 +41,8 @@ type GroupInitParameters struct {
 	// +kubebuilder:validation:Optional
 	RolesSelector *v2.Selector `json:"rolesSelector,omitempty" tf:"-"`
 
-	// (Set of Number) Identifiers of the members of the group, for example from User.
-	// Identifiers of the members of the group, for example from `superset_user`.
+	// (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+	// Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
 	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/cluster/security/v1alpha1.User
 	// +listType=set
 	Users []*float64 `json:"users,omitempty" tf:"users,omitempty"`
@@ -78,8 +78,8 @@ type GroupObservation struct {
 	// +listType=set
 	Roles []*float64 `json:"roles,omitempty" tf:"roles,omitempty"`
 
-	// (Set of Number) Identifiers of the members of the group, for example from User.
-	// Identifiers of the members of the group, for example from `superset_user`.
+	// (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+	// Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
 	// +listType=set
 	Users []*float64 `json:"users,omitempty" tf:"users,omitempty"`
 }
@@ -116,8 +116,8 @@ type GroupParameters struct {
 	// +kubebuilder:validation:Optional
 	RolesSelector *v2.Selector `json:"rolesSelector,omitempty" tf:"-"`
 
-	// (Set of Number) Identifiers of the members of the group, for example from User.
-	// Identifiers of the members of the group, for example from `superset_user`.
+	// (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+	// Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
 	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/cluster/security/v1alpha1.User
 	// +kubebuilder:validation:Optional
 	// +listType=set

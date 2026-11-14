@@ -27,6 +27,20 @@ type ChartInitParameters struct {
 	// Person or group that certified the chart.
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
 
+	// (Set of Number) Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the position_json of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the `position_json` of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/namespaced/dashboard/v1alpha1.Dashboard
+	// +listType=set
+	Dashboards []*float64 `json:"dashboards,omitempty" tf:"dashboards,omitempty"`
+
+	// References to Dashboard in dashboard to populate dashboards.
+	// +kubebuilder:validation:Optional
+	DashboardsRefs []v2.NamespacedReference `json:"dashboardsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Dashboard in dashboard to populate dashboards.
+	// +kubebuilder:validation:Optional
+	DashboardsSelector *v2.NamespacedSelector `json:"dashboardsSelector,omitempty" tf:"-"`
+
 	// (Number) Identifier of the dataset the chart is built on.
 	// Identifier of the dataset the chart is built on.
 	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/namespaced/dataset/v1alpha1.Dataset
@@ -47,6 +61,13 @@ type ChartInitParameters struct {
 	// text description of the chart.
 	// Free-text description of the chart.
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
+
+	// (String) URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
+	// (Boolean) Whether the chart is managed outside Superset, for example by Crossplane. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to false. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String) Name of the chart.
 	// Name of the chart.
@@ -108,6 +129,11 @@ type ChartObservation struct {
 	// Person or group that certified the chart.
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
 
+	// (Set of Number) Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the position_json of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the `position_json` of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// +listType=set
+	Dashboards []*float64 `json:"dashboards,omitempty" tf:"dashboards,omitempty"`
+
 	// (Number) Identifier of the dataset the chart is built on.
 	// Identifier of the dataset the chart is built on.
 	DatasourceID *float64 `json:"datasourceId,omitempty" tf:"datasource_id,omitempty"`
@@ -120,8 +146,15 @@ type ChartObservation struct {
 	// Free-text description of the chart.
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
 
+	// (String) URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
 	// (Number) Numeric identifier of the chart.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
+
+	// (Boolean) Whether the chart is managed outside Superset, for example by Crossplane. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to false. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to `false`.
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String) Name of the chart.
 	// Name of the chart.
@@ -145,6 +178,10 @@ type ChartObservation struct {
 	// +listType=set
 	Tags []*string `json:"tags,omitempty" tf:"tags,omitempty"`
 
+	// (String) UUID of the chart, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
+	// UUID of the chart, the identifier used in export files. Superset 3.1 does not return it, so it is null there.
+	UUID *string `json:"uuid,omitempty" tf:"uuid,omitempty"`
+
 	// (String) Visualization type, for example table or echarts_timeseries_line.
 	// Visualization type, for example `table` or `echarts_timeseries_line`.
 	VizType *string `json:"vizType,omitempty" tf:"viz_type,omitempty"`
@@ -166,6 +203,21 @@ type ChartParameters struct {
 	// Person or group that certified the chart.
 	// +kubebuilder:validation:Optional
 	CertifiedBy *string `json:"certifiedBy,omitempty" tf:"certified_by,omitempty"`
+
+	// (Set of Number) Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the position_json of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// Identifiers of the dashboards the chart is linked to. When unset, the links are left as they are, as made by the `position_json` of the dashboards; when set, the chart is linked to exactly these dashboards. A linked chart without a place in the layout of the dashboard is listed on the dashboard but not shown, so manage the link from one side only.
+	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/namespaced/dashboard/v1alpha1.Dashboard
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	Dashboards []*float64 `json:"dashboards,omitempty" tf:"dashboards,omitempty"`
+
+	// References to Dashboard in dashboard to populate dashboards.
+	// +kubebuilder:validation:Optional
+	DashboardsRefs []v2.NamespacedReference `json:"dashboardsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Dashboard in dashboard to populate dashboards.
+	// +kubebuilder:validation:Optional
+	DashboardsSelector *v2.NamespacedSelector `json:"dashboardsSelector,omitempty" tf:"-"`
 
 	// (Number) Identifier of the dataset the chart is built on.
 	// Identifier of the dataset the chart is built on.
@@ -190,6 +242,15 @@ type ChartParameters struct {
 	// Free-text description of the chart.
 	// +kubebuilder:validation:Optional
 	Description *string `json:"description,omitempty" tf:"description,omitempty"`
+
+	// (String) URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// URL of the place where the chart is managed, shown as a link in the banner of a chart that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+	// +kubebuilder:validation:Optional
+	ExternalURL *string `json:"externalUrl,omitempty" tf:"external_url,omitempty"`
+
+	// (Boolean) Whether the chart is managed outside Superset, for example by Crossplane. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to false. Superset then shows a banner on the chart and disables its editing in the UI. Defaults to `false`.
+	// +kubebuilder:validation:Optional
+	IsManagedExternally *bool `json:"isManagedExternally,omitempty" tf:"is_managed_externally,omitempty"`
 
 	// (String) Name of the chart.
 	// Name of the chart.
@@ -270,7 +331,7 @@ type ChartStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
 
-// Chart is the Schema for the Charts API. Manages a chart. Place a chart on a dashboard through the position_json of the dashboard. To manage an existing object, set the crossplane.io/external-name annotation to its numeric ID.
+// Chart is the Schema for the Charts API. Manages a chart. A chart is placed on a dashboard through the position_json of the dashboard, which lays it out, or through its own dashboards, which only links it. To manage an existing object, set the crossplane.io/external-name annotation to its numeric ID.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="EXTERNAL-NAME",type="string",JSONPath=".metadata.annotations.crossplane\\.io/external-name"

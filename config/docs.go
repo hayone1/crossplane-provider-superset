@@ -28,6 +28,12 @@ var docReplacements = []struct{ old, new string }{
 	{"terraform plan", "the next reconcile"},
 	{" is destroyed", " is deleted"},
 	{" are destroyed", " are deleted"},
+	{"for example by Terraform", "for example by Crossplane"},
+	// superset_sql_execution: Crossplane does not replace objects.
+	{"a change of the statement, the connection, the schema or the catalog replaces the resource, which runs destroy_sql first when it is set.",
+		"the statement, the connection, the schema and the catalog cannot change: to change them, delete the managed resource, which runs destroySql when it is set, and create a new one."},
+	{"(expose_in_sqllab)", "(exposeInSqllab)"},
+	{"(allow_dml)", "(allowDml)"},
 }
 
 var (

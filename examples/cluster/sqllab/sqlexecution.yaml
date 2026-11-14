@@ -1,0 +1,50 @@
+# This example runs a SQL statement through SQL Lab: it creates a view, and it drops the view
+# when you delete the managed resource. The connection must allow DML (allowDml) for a
+# statement that changes data or structure. To run the statement again, change triggers.
+# The example names the connection by its ID (databaseIdRef), so that the managed resource can
+# also take over an existing run by its external name without running the statement again.
+# e2e-update: SQLExecution/daily-sales {"spec":{"forProvider":{"triggers":{"version":"2"}}}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sql-db-db
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  password: examples
+---
+apiVersion: database.superset.crossplane.io/v1alpha1
+kind: Database
+metadata:
+  name: sql-db
+spec:
+  forProvider:
+    connectionName: Warehouse (SQL execution example)
+    dbEngine: postgresql
+    dbHost: postgres
+    dbPort: 5432
+    dbName: examples
+    dbUser: examples
+    dbPassSecretRef:
+      name: sql-db-db
+      namespace: crossplane-system
+      key: password
+    exposeInSqllab: true
+    allowRunAsync: false
+    allowCtas: false
+    allowCvas: false
+    allowDml: true
+---
+apiVersion: sqllab.superset.crossplane.io/v1alpha1
+kind: SQLExecution
+metadata:
+  name: daily-sales
+spec:
+  forProvider:
+    databaseIdRef:
+      name: sql-db
+    schema: public
+    sql: CREATE OR REPLACE VIEW daily_sales AS SELECT day, SUM(amount) AS amount FROM sales GROUP BY day
+    destroySql: DROP VIEW IF EXISTS daily_sales
+    triggers:
+      version: "1"

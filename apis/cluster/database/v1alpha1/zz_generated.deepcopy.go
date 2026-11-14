@@ -113,6 +113,11 @@ func (in *DatabaseInitParameters) DeepCopyInto(out *DatabaseInitParameters) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
 	if in.Extra != nil {
 		in, out := &in.Extra, &out.Extra
 		*out = new(string)
@@ -125,6 +130,11 @@ func (in *DatabaseInitParameters) DeepCopyInto(out *DatabaseInitParameters) {
 	}
 	if in.ImpersonateUser != nil {
 		in, out := &in.ImpersonateUser, &out.ImpersonateUser
+		*out = new(bool)
+		**out = **in
+	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
 		*out = new(bool)
 		**out = **in
 	}
@@ -260,6 +270,11 @@ func (in *DatabaseObservation) DeepCopyInto(out *DatabaseObservation) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
 	if in.Extra != nil {
 		in, out := &in.Extra, &out.Extra
 		*out = new(string)
@@ -280,6 +295,11 @@ func (in *DatabaseObservation) DeepCopyInto(out *DatabaseObservation) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
+		*out = new(bool)
+		**out = **in
+	}
 	if in.SSHTunnel != nil {
 		in, out := &in.SSHTunnel, &out.SSHTunnel
 		*out = new(SSHTunnelObservation)
@@ -287,6 +307,11 @@ func (in *DatabaseObservation) DeepCopyInto(out *DatabaseObservation) {
 	}
 	if in.ServerCert != nil {
 		in, out := &in.ServerCert, &out.ServerCert
+		*out = new(string)
+		**out = **in
+	}
+	if in.UUID != nil {
+		in, out := &in.UUID, &out.UUID
 		*out = new(string)
 		**out = **in
 	}
@@ -375,6 +400,11 @@ func (in *DatabaseParameters) DeepCopyInto(out *DatabaseParameters) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.ExternalURL != nil {
+		in, out := &in.ExternalURL, &out.ExternalURL
+		*out = new(string)
+		**out = **in
+	}
 	if in.Extra != nil {
 		in, out := &in.Extra, &out.Extra
 		*out = new(string)
@@ -387,6 +417,11 @@ func (in *DatabaseParameters) DeepCopyInto(out *DatabaseParameters) {
 	}
 	if in.ImpersonateUser != nil {
 		in, out := &in.ImpersonateUser, &out.ImpersonateUser
+		*out = new(bool)
+		**out = **in
+	}
+	if in.IsManagedExternally != nil {
+		in, out := &in.IsManagedExternally, &out.IsManagedExternally
 		*out = new(bool)
 		**out = **in
 	}

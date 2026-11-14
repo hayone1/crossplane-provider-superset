@@ -27,6 +27,20 @@ type UserInitParameters struct {
 	// First name of the user.
 	FirstName *string `json:"firstName,omitempty" tf:"first_name,omitempty"`
 
+	// (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+	// Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/namespaced/security/v1alpha1.Group
+	// +listType=set
+	Groups []*float64 `json:"groups,omitempty" tf:"groups,omitempty"`
+
+	// References to Group in security to populate groups.
+	// +kubebuilder:validation:Optional
+	GroupsRefs []v2.NamespacedReference `json:"groupsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Group in security to populate groups.
+	// +kubebuilder:validation:Optional
+	GroupsSelector *v2.NamespacedSelector `json:"groupsSelector,omitempty" tf:"-"`
+
 	// (String) Last name of the user.
 	// Last name of the user.
 	LastName *string `json:"lastName,omitempty" tf:"last_name,omitempty"`
@@ -67,6 +81,11 @@ type UserObservation struct {
 	// First name of the user.
 	FirstName *string `json:"firstName,omitempty" tf:"first_name,omitempty"`
 
+	// (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+	// Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+	// +listType=set
+	Groups []*float64 `json:"groups,omitempty" tf:"groups,omitempty"`
+
 	// (Number) Numeric identifier of the user.
 	ID *string `json:"id,omitempty" tf:"id,omitempty"`
 
@@ -103,6 +122,21 @@ type UserParameters struct {
 	// First name of the user.
 	// +kubebuilder:validation:Optional
 	FirstName *string `json:"firstName,omitempty" tf:"first_name,omitempty"`
+
+	// (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+	// Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+	// +crossplane:generate:reference:type=github.com/hayone1/crossplane-provider-superset/apis/namespaced/security/v1alpha1.Group
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	Groups []*float64 `json:"groups,omitempty" tf:"groups,omitempty"`
+
+	// References to Group in security to populate groups.
+	// +kubebuilder:validation:Optional
+	GroupsRefs []v2.NamespacedReference `json:"groupsRefs,omitempty" tf:"-"`
+
+	// Selector for a list of Group in security to populate groups.
+	// +kubebuilder:validation:Optional
+	GroupsSelector *v2.NamespacedSelector `json:"groupsSelector,omitempty" tf:"-"`
 
 	// (String) Last name of the user.
 	// Last name of the user.

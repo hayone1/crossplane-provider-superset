@@ -160,6 +160,11 @@ spec:
                       (Boolean) Whether the connection is available in SQL Lab.
                       Whether the connection is available in SQL Lab.
                     type: boolean
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   extra:
                     description: |-
                       (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
@@ -174,6 +179,13 @@ spec:
                     description: |-
                       in user instead of the user of the connection. Defaults to false.
                       Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
+                    type: boolean
+                  isManagedExternally:
+                    description: (Boolean) Whether the connection is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the connection and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the connection and
+                      disables its editing in the UI. Defaults to `false`.
                     type: boolean
                   maskedEncryptedExtraSecretRef:
                     description: |-
@@ -395,6 +407,11 @@ spec:
                       (Boolean) Whether the connection is available in SQL Lab.
                       Whether the connection is available in SQL Lab.
                     type: boolean
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   extra:
                     description: |-
                       (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
@@ -409,6 +426,13 @@ spec:
                     description: |-
                       in user instead of the user of the connection. Defaults to false.
                       Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
+                    type: boolean
+                  isManagedExternally:
+                    description: (Boolean) Whether the connection is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the connection and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the connection and
+                      disables its editing in the UI. Defaults to `false`.
                     type: boolean
                   maskedEncryptedExtraSecretRef:
                     description: |-
@@ -714,6 +738,11 @@ spec:
                       (Boolean) Whether the connection is available in SQL Lab.
                       Whether the connection is available in SQL Lab.
                     type: boolean
+                  externalUrl:
+                    description: |-
+                      (String) URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                      URL of the place where the connection is managed, shown as a link in the banner of a connection that is managed externally. Superset does not return it, so a change made in Superset is not detected.
+                    type: string
                   extra:
                     description: |-
                       (String) JSON document with the extra configuration of the connection, such as engine_params, metadata_params or schemas_allowed_for_file_upload. Defaults to {"client_encoding": "utf8"} when the connection is created without it.
@@ -731,6 +760,13 @@ spec:
                     description: |-
                       in user instead of the user of the connection. Defaults to false.
                       Whether queries run as the logged-in user instead of the user of the connection. Defaults to `false`.
+                    type: boolean
+                  isManagedExternally:
+                    description: (Boolean) Whether the connection is managed outside
+                      Superset, for example by Crossplane. Superset then shows a banner
+                      on the connection and disables its editing in the UI. Defaults
+                      to false. Superset then shows a banner on the connection and
+                      disables its editing in the UI. Defaults to `false`.
                     type: boolean
                   serverCert:
                     description: |-
@@ -759,6 +795,11 @@ spec:
                           User on the SSH server.
                         type: string
                     type: object
+                  uuid:
+                    description: |-
+                      (String) UUID of the connection, the identifier used in export files.
+                      UUID of the connection, the identifier used in export files.
+                    type: string
                 type: object
               conditions:
                 description: Conditions of the resource.

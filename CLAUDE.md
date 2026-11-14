@@ -1,8 +1,8 @@
 # crossplane-provider-superset
 
 Crossplane provider for Apache Superset, generated with Upjet from the Terraform provider
-`platacard/superset` (`github.com/platacard/terraform-provider-superset`; local copy with the
-fixes proposed upstream: `../terraform-provider-superset`, branch `crossplane-integration`).
+`platacard/superset` (`github.com/platacard/terraform-provider-superset`; local copy:
+`../terraform-provider-superset`, remote `fork` for our pull request branches).
 
 ## Every session
 

@@ -121,6 +121,8 @@ func (tr *Dashboard) LateInitialize(attrs []byte) (bool, error) {
 	opts = append(opts, resource.WithNameFilter("CertificationDetails"))
 	opts = append(opts, resource.WithNameFilter("CertifiedBy"))
 	opts = append(opts, resource.WithNameFilter("CSS"))
+	opts = append(opts, resource.WithNameFilter("ExternalURL"))
+	opts = append(opts, resource.WithNameFilter("IsManagedExternally"))
 	opts = append(opts, resource.WithNameFilter("JSONMetadata"))
 	opts = append(opts, resource.WithNameFilter("Owners"))
 	opts = append(opts, resource.WithNameFilter("PositionJSON"))

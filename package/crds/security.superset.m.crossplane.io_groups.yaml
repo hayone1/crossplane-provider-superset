@@ -171,8 +171,8 @@ spec:
                     type: object
                   users:
                     description: |-
-                      (Set of Number) Identifiers of the members of the group, for example from User.
-                      Identifiers of the members of the group, for example from `superset_user`.
+                      (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+                      Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
                     items:
                       type: number
                     type: array
@@ -384,8 +384,8 @@ spec:
                     type: object
                   users:
                     description: |-
-                      (Set of Number) Identifiers of the members of the group, for example from User.
-                      Identifiers of the members of the group, for example from `superset_user`.
+                      (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+                      Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
                     items:
                       type: number
                     type: array
@@ -571,8 +571,8 @@ spec:
                     x-kubernetes-list-type: set
                   users:
                     description: |-
-                      (Set of Number) Identifiers of the members of the group, for example from User.
-                      Identifiers of the members of the group, for example from `superset_user`.
+                      (Set of Number) Identifiers of the members of the group, for example from User. When unset, the members are left as they are, as made by the groups of the users; when set, the group has exactly these members, and [] removes them all. Manage a membership from one side only, here or in User.
+                      Identifiers of the members of the group, for example from `superset_user`. When unset, the members are left as they are, as made by the `groups` of the users; when set, the group has exactly these members, and `[]` removes them all. Manage a membership from one side only, here or in `superset_user`.
                     items:
                       type: number
                     type: array

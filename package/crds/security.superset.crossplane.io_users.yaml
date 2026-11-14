@@ -90,6 +90,92 @@ spec:
                       (String) First name of the user.
                       First name of the user.
                     type: string
+                  groups:
+                    description: |-
+                      (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+                      Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
+                  groupsRefs:
+                    description: References to Group in security to populate groups.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  groupsSelector:
+                    description: Selector for a list of Group in security to populate
+                      groups.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
                   lastName:
                     description: |-
                       (String) Last name of the user.
@@ -233,6 +319,92 @@ spec:
                       (String) First name of the user.
                       First name of the user.
                     type: string
+                  groups:
+                    description: |-
+                      (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+                      Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
+                  groupsRefs:
+                    description: References to Group in security to populate groups.
+                    items:
+                      description: A Reference to a named object.
+                      properties:
+                        name:
+                          description: Name of the referenced object.
+                          type: string
+                        policy:
+                          description: Policies for referencing.
+                          properties:
+                            resolution:
+                              default: Required
+                              description: |-
+                                Resolution specifies whether resolution of this reference is required.
+                                The default is 'Required', which means the reconcile will fail if the
+                                reference cannot be resolved. 'Optional' means this reference will be
+                                a no-op if it cannot be resolved.
+                              enum:
+                              - Required
+                              - Optional
+                              type: string
+                            resolve:
+                              description: |-
+                                Resolve specifies when this reference should be resolved. The default
+                                is 'IfNotPresent', which will attempt to resolve the reference only when
+                                the corresponding field is not present. Use 'Always' to resolve the
+                                reference on every reconcile.
+                              enum:
+                              - Always
+                              - IfNotPresent
+                              type: string
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  groupsSelector:
+                    description: Selector for a list of Group in security to populate
+                      groups.
+                    properties:
+                      matchControllerRef:
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
+                        type: boolean
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: MatchLabels ensures an object with matching labels
+                          is selected.
+                        type: object
+                      policy:
+                        description: Policies for selection.
+                        properties:
+                          resolution:
+                            default: Required
+                            description: |-
+                              Resolution specifies whether resolution of this reference is required.
+                              The default is 'Required', which means the reconcile will fail if the
+                              reference cannot be resolved. 'Optional' means this reference will be
+                              a no-op if it cannot be resolved.
+                            enum:
+                            - Required
+                            - Optional
+                            type: string
+                          resolve:
+                            description: |-
+                              Resolve specifies when this reference should be resolved. The default
+                              is 'IfNotPresent', which will attempt to resolve the reference only when
+                              the corresponding field is not present. Use 'Always' to resolve the
+                              reference on every reconcile.
+                            enum:
+                            - Always
+                            - IfNotPresent
+                            type: string
+                        type: object
+                    type: object
                   lastName:
                     description: |-
                       (String) Last name of the user.
@@ -463,6 +635,14 @@ spec:
                       (String) First name of the user.
                       First name of the user.
                     type: string
+                  groups:
+                    description: |-
+                      (Set of Number) Identifiers of the groups the user is a member of, on Superset 6, for example from Group. When unset, the memberships are left as they are, as made by the users of the groups; when set, the user is a member of exactly these groups, and [] removes it from every group. Manage a membership from one side only, here or in Group. Null on older versions of Superset, which have no groups and reject the attribute.
+                      Identifiers of the groups the user is a member of, on Superset 6, for example from `superset_group`. When unset, the memberships are left as they are, as made by the `users` of the groups; when set, the user is a member of exactly these groups, and `[]` removes it from every group. Manage a membership from one side only, here or in `superset_group`. Null on older versions of Superset, which have no groups and reject the attribute.
+                    items:
+                      type: number
+                    type: array
+                    x-kubernetes-list-type: set
                   id:
                     description: (Number) Numeric identifier of the user.
                     type: string
